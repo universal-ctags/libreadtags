@@ -895,23 +895,33 @@ static tagResult find (tagFile *const file, tagEntry *const entry,
 	return result;
 }
 
-static tagResult findNext (tagFile *const file, tagEntry *const entry)
+static tagResult findNextFull (tagFile *const file, tagEntry *const entry,
+							   int sorted,
+							   int (* isAcceptable) (tagFile *const, void *),
+							   void *data)
 {
 	tagResult result;
-	if ((file->sortMethod == TAG_SORTED      && !file->search.ignorecase) ||
-		(file->sortMethod == TAG_FOLDSORTED  &&  file->search.ignorecase))
+	if (sorted)
 	{
 		result = tagsNext (file, entry);
-		if (result == TagSuccess  && nameComparison (file) != 0)
+		if (result == TagSuccess  && !isAcceptable (file, data))
 			result = TagFailure;
 	}
 	else
 	{
-		result = findSequential (file);
+		result = findSequentialFull (file, isAcceptable, data);
 		if (result == TagSuccess  &&  entry != NULL)
 			parseTagLine (file, entry);
 	}
 	return result;
+}
+
+static tagResult findNext (tagFile *const file, tagEntry *const entry)
+{
+	return findNextFull (file, entry,
+						 (file->sortMethod == TAG_SORTED      && !file->search.ignorecase) ||
+						 (file->sortMethod == TAG_FOLDSORTED  &&  file->search.ignorecase),
+						 nameAcceptable, NULL);
 }
 
 /*
