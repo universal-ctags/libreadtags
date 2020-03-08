@@ -88,6 +88,7 @@ struct sTagFile {
 */
 static const char *const EmptyString = "";
 static const char *const PseudoTagPrefix = "!_";
+static const size_t PseudoTagPrefixLength = 2;
 
 /*
 *   FUNCTION DEFINITIONS
@@ -532,6 +533,11 @@ static char *duplicate (const char *str)
 	return result;
 }
 
+static int isPseudoTagLine (const char *buffer)
+{
+	return (strncmp (buffer, PseudoTagPrefix, PseudoTagPrefixLength) == 0);
+}
+
 static void readPseudoTags (tagFile *const file, tagFileInfo *const info)
 {
 	fpos_t startOfLine;
@@ -550,7 +556,7 @@ static void readPseudoTags (tagFile *const file, tagFileInfo *const info)
 		fgetpos (file->fp, &startOfLine);
 		if (! readTagLine (file))
 			break;
-		if (strncmp (file->line.buffer, PseudoTagPrefix, prefixLength) != 0)
+		if (!isPseudoTagLine (file->line.buffer))
 			break;
 		else
 		{
@@ -595,7 +601,7 @@ static void gotoFirstLogicalTag (tagFile *const file)
 		fgetpos (file->fp, &startOfLine);
 		if (! readTagLine (file))
 			break;
-		if (strncmp (file->line.buffer, PseudoTagPrefix, prefixLength) != 0)
+		if (!isPseudoTagLine (file->line.buffer))
 			break;
 	}
 	fsetpos (file->fp, &startOfLine);
