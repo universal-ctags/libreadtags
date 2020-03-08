@@ -829,18 +829,30 @@ static tagResult findBinary (tagFile *const file)
 	return result;
 }
 
-static tagResult findSequential (tagFile *const file)
+static tagResult findSequentialFull (tagFile *const file,
+									 int (* isAcceptable) (tagFile *const, void *),
+									 void *data)
 {
 	tagResult result = TagFailure;
 	if (file->initialized)
 	{
 		while (result == TagFailure  &&  readTagLine (file))
 		{
-			if (nameComparison (file) == 0)
+			if (isAcceptable (file, data))
 				result = TagSuccess;
 		}
 	}
 	return result;
+}
+
+static int nameAcceptable (tagFile *const file, void *unused)
+{
+	return (nameComparison (file) == 0);
+}
+
+static tagResult findSequential (tagFile *const file)
+{
+	return findSequentialFull (file, nameAcceptable, NULL);
 }
 
 static tagResult find (tagFile *const file, tagEntry *const entry,
