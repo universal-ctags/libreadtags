@@ -12,7 +12,7 @@ jobs:
       - checkout
       - run:
           name: Install build tools
-          commands: |
+          command: |
             yum -y install gcc automake autoconf libtool make
       - run:
           name: Build
