@@ -606,29 +606,56 @@ static tagFile *initialize (const char *const filePath, tagFileInfo *const info)
 	tagFile *result = (tagFile*) calloc ((size_t) 1, sizeof (tagFile));
 	if (result != NULL)
 	{
-		growString (&result->line);
-		growString (&result->name);
+		if (growString (&result->line) == 0)
+			goto mem_error;
+		if (growString (&result->name) == 0)
+			goto mem_error;
 		result->fields.max = 20;
 		result->fields.list = (tagExtensionField*) calloc (
 			result->fields.max, sizeof (tagExtensionField));
+		if (result->fields.list == NULL)
+			goto mem_error;
 		result->fp = fopen (filePath, "rb");
 		if (result->fp == NULL)
 		{
-			free (result);
-			result = NULL;
-			info->status.error_number = errno;
+			if (info)
+				info->status.error_number = errno;
+			goto file_error;
 		}
 		else
 		{
-			fseek (result->fp, 0, SEEK_END);
+			if (fseek (result->fp, 0, SEEK_END) == -1)
+			{
+				if (info)
+					info->status.error_number = errno;
+				goto file_error;
+			}
 			result->size = ftell (result->fp);
+			if (result->size == -1)
+			{
+				if (info)
+					info->status.error_number = errno;
+				goto file_error;
+			}
 			rewind (result->fp);
 			readPseudoTags (result, info);
-			info->status.opened = 1;
+			if (info)
+				info->status.opened = 1;
 			result->initialized = 1;
 		}
 	}
 	return result;
+ mem_error:
+	if (info)
+		info->status.error_number = 0;
+ file_error:
+	free (result->line.buffer);
+	free (result->name.buffer);
+	free (result->fields.list);
+	free (result);
+	if (info)
+		info->status.opened = 0;
+	return NULL;
 }
 
 static void terminate (tagFile *const file)

@@ -150,9 +150,11 @@ typedef struct {
 *  information about the tag file. If successful, the function will return a
 *  handle which must be supplied to other calls to read information from the
 *  tag file, and info.status.opened will be set to true. If unsuccessful,
+*  the function will return NULL, and
 *  info.status.opened will be set to false and info.status.error_number will
 *  be set to the errno value representing the system error preventing the tag
-*  file from being successfully opened.
+*  file from being successfully opened. The error_number will be zero if the
+*  memory allocation for the handle is failed.
 */
 extern tagFile *tagsOpen (const char *const filePath, tagFileInfo *const info);
 
