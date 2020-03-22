@@ -24,3 +24,9 @@ m4
 Makefile
 Makefile.in
 missing
+test-driver
+
+tests/test-api-tagsOpen
+tests/test-api-tagsOpen.log
+tests/test-api-tagsOpen.trs
+tests/test-suite.log
