@@ -10,3 +10,5 @@ nobase_include_HEADERS = readtags.h
 EXTRA_DIST = libreadtags.pc.in
 pkgconfigdir = $(libdir)/pkgconfig
 pkgconfig_DATA = libreadtags.pc
+
+SUBDIRS = . tests
