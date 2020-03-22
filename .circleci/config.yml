@@ -2,7 +2,7 @@ version: 2
 jobs:
   fedora31:
     working_directory: ~/libreadtags
-    docer:
+    docker:
       - image: docker.io/fedora:31
     steps:
       - run:
