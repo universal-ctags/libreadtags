@@ -3,7 +3,7 @@
 *
 *   This source code is released into the public domain.
 *
-*   This module contains functions for reading tag files.
+*   Testing tagsOpen() API function
 */
 
 #include "readtags.h"
