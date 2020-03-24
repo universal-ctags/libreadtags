@@ -86,6 +86,15 @@ main (void)
 	}
 	fprintf (stderr, "ok\n");
 
+	fprintf (stderr, "opening no-existing tags file with NULL tagFileInfo...");
+	t = tagsOpen (tags0, NULL);
+	if (t != NULL)
+	{
+		fprintf (stderr, "unexpected result (t: %p)\n", t);
+		return 1;
+	}
+	fprintf (stderr, "ok\n");
+
 	tagFileInfo expected1 = {
 		.file.format = 2,
 		.file.sort = TAG_SORTED,
@@ -117,6 +126,24 @@ main (void)
 		return 1;
 	}
 	fprintf (stderr, "ok\n");
+
+	fprintf (stderr, "opening an existing tags file with NULL tagFileInfo...");
+	t = tagsOpen (tags1, NULL);
+	if (t == NULL)
+	{
+		fprintf (stderr, "unexpected result\n");
+		return 1;
+	}
+	fprintf (stderr, "ok\n");
+
+	fprintf (stderr, "closing the tag file...");
+	if (tagsClose (t) != TagSuccess)
+	{
+		fprintf (stderr, "unexpected result\n");
+		return 1;
+	}
+	fprintf (stderr, "ok\n");
+
 
 	return 0;
 }
