@@ -20,7 +20,7 @@ LDADD = $(top_builddir)/libreadtags.la
 
 test_api_tagsOpen = test-api-tagsOpen.c
 test_api_tagsOpen_DEPENDENCIES = $(DEPS)
-EXTRA_DIST += api-tagsOpen.tags
+EXTRA_DIST += api-tagsOpen-ectags.tags
 
 test_api_tagsFind = test-api-tagsFind.c
 test_api_tagsFind_DEPENDENCIES = $(DEPS)
