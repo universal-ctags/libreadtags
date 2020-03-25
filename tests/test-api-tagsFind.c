@@ -3,7 +3,7 @@
 *
 *   This source code is released into the public domain.
 *
-*   Testing tagsFind() and tagsFindNext API functions
+*   Testing tagsFind() and tagsFindNext() API functions
 */
 
 #include "readtags.h"
