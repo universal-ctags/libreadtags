@@ -14,7 +14,7 @@ check_PROGRAMS = \
 
 EXTRA_DIST =
 
-AM_CPPFLAGS = -I $(top_builddir)
+AM_CPPFLAGS = -I $(top_srcdir)
 DEPS = $(top_builddir)/libreadtags.la
 LDADD = $(top_builddir)/libreadtags.la
 
