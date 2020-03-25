@@ -591,6 +591,11 @@ static void readPseudoTags (tagFile *const file, tagFileInfo *const info)
 	fsetpos (file->fp, &startOfLine);
 }
 
+static int doesFilePointPseudoTag (tagFile *const file, void *unused)
+{
+	return isPseudoTagLine (file->name.buffer);
+}
+
 static void gotoFirstLogicalTag (tagFile *const file)
 {
 	fpos_t startOfLine;
@@ -924,6 +929,22 @@ static tagResult findNext (tagFile *const file, tagEntry *const entry)
 						 nameAcceptable, NULL);
 }
 
+static tagResult findPseudoTag (tagFile *const file, int rewindBeforeFinding, tagEntry *const entry)
+{
+	tagResult result = TagFailure;
+	if (file != NULL  &&  file->initialized)
+	{
+		if (rewindBeforeFinding)
+			rewind (file->fp);
+		result = findNextFull (file, entry,
+							   (file->sortMethod == TAG_SORTED || file->sortMethod == TAG_FOLDSORTED),
+							   doesFilePointPseudoTag,
+							   NULL);
+	}
+	return result;
+}
+
+
 /*
 *  EXTERNAL INTERFACE
 */
@@ -986,6 +1007,16 @@ extern tagResult tagsFindNext (tagFile *const file, tagEntry *const entry)
 	if (file != NULL  &&  file->initialized)
 		result = findNext (file, entry);
 	return result;
+}
+
+extern tagResult tagsFirstPseudoTag (tagFile *const file, tagEntry *const entry)
+{
+	return findPseudoTag (file, 1, entry);
+}
+
+extern tagResult tagsNextPseudoTag (tagFile *const file, tagEntry *const entry)
+{
+	return findPseudoTag (file, 0, entry);
 }
 
 extern tagResult tagsClose (tagFile *const file)
