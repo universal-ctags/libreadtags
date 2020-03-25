@@ -9,7 +9,9 @@
 #include "readtags.h"
 
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
+#include <unistd.h>
 
 
 static int
@@ -70,6 +72,16 @@ check_info (tagFileInfo *info, tagFileInfo *expected)
 int
 main (void)
 {
+	char *srcdir = getenv ("srcdir");
+	if (srcdir)
+	{
+		if (chdir (srcdir) == -1)
+		{
+			perror ("chdir");
+			return 99;
+		}
+	}
+
 	tagFile *t;
 	tagFileInfo info;
 

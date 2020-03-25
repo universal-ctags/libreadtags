@@ -9,7 +9,9 @@
 #include "readtags.h"
 
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
+#include <unistd.h>
 
 
 struct expectation {
@@ -160,6 +162,16 @@ check_finding (const char *tags, const char *name, const int options,
 int
 main (void)
 {
+	char *srcdir = getenv ("srcdir");
+	if (srcdir)
+	{
+		if (chdir (srcdir) == -1)
+		{
+			perror ("chdir");
+			return 99;
+		}
+	}
+
 	/*
 	 * sorted=yes
 	 */
