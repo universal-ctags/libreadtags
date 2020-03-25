@@ -29,6 +29,9 @@ test-driver
 tests/test-api-tagsFind
 tests/test-api-tagsFind.log
 tests/test-api-tagsFind.trs
+tests/test-api-tagsFirstPseudoTag
+tests/test-api-tagsFirstPseudoTag.log
+tests/test-api-tagsFirstPseudoTag.trs
 tests/test-api-tagsOpen
 tests/test-api-tagsOpen.log
 tests/test-api-tagsOpen.trs
