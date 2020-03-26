@@ -238,6 +238,19 @@ extern tagResult tagsFind (tagFile *const file, tagEntry *const entry, const cha
 extern tagResult tagsFindNext (tagFile *const file, tagEntry *const entry);
 
 /*
+*  Does the same as tagsFirst(), but is specialized to pseudo tags.
+*  If tagFileInfo doesn't contain pseudo tags you are interested, read
+*  them sequentially with this function and tagsNextPseudoTag().
+*/
+extern tagResult tagsFirstPseudoTag (tagFile *const file, tagEntry *const entry);
+
+/*
+*  Does the same as tagsNext(), but is specialized to pseudo tags. Use with
+*  tagsFirstPseudoTag().
+*/
+extern tagResult tagsNextPseudoTag (tagFile *const file, tagEntry *const entry);
+
+/*
 *  Call tagsTerminate() at completion of reading the tag file, which will
 *  close the file and free any internal memory allocated. The function will
 *  return TagFailure is no file is currently open, TagSuccess otherwise.

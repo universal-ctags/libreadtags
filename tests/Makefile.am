@@ -2,6 +2,7 @@ TESTS = \
 	\
 	test-api-tagsOpen \
 	test-api-tagsFind \
+	test-api-tagsFirstPseudoTag \
 	\
 	$(NULL)
 
@@ -9,6 +10,7 @@ check_PROGRAMS = \
 	\
 	test-api-tagsOpen \
 	test-api-tagsFind \
+	test-api-tagsFirstPseudoTag \
 	\
 	$(NULL)
 
@@ -28,3 +30,8 @@ EXTRA_DIST += duplicated-names.c
 EXTRA_DIST += duplicated-names--sorted-yes.tags
 EXTRA_DIST += duplicated-names--sorted-no.tags
 EXTRA_DIST += duplicated-names--sorted-foldcase.tags
+
+test_api_tagsFirstPseudoTag = test-api-tagsFirstPseudoTag.c
+test_api_tagsFirstPseudoTag_DEPENDENCIES = $(DEPS)
+EXTRA_DIST += ptag-sort-no.tags
+EXTRA_DIST += ptag-sort-yes.tags
