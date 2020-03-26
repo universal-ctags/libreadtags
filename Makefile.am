@@ -1,6 +1,8 @@
 AUTOMAKE_OPTIONS = foreign
 ACLOCAL_AMFLAGS = -I m4
 
+AM_CFLAGS=-Wall
+
 lib_LTLIBRARIES    = libreadtags.la
 libreadtags_la_LDFLAGS = -no-undefined -version-info $(LT_VERSION)
 
