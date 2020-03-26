@@ -599,7 +599,6 @@ static int doesFilePointPseudoTag (tagFile *const file, void *unused)
 static void gotoFirstLogicalTag (tagFile *const file)
 {
 	fpos_t startOfLine;
-	const size_t prefixLength = strlen (PseudoTagPrefix);
 	rewind (file->fp);
 	while (1)
 	{
