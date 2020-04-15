@@ -438,7 +438,8 @@ static void parseTagLine (tagFile *file, tagEntry *const entry)
 		{
 			/* + 1 is for moving the area including the last '\0'. */
 			memmove (p, next, p_len + 1);
-			tab -= skip - 1;
+			if (tab)
+				tab -= skip - 1;
 		}
 	}
 
