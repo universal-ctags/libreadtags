@@ -340,7 +340,8 @@ static void parseExtensionFields (tagFile *const file, tagEntry *const entry,
 								  char *const string)
 {
 	char *p = string;
-	size_t q_len = strlen (p);
+	char *tail = string + (string? strlen(string):0);
+	size_t q_len;
 
 	while (p != NULL  &&  *p != '\0')
 	{
@@ -364,6 +365,8 @@ static void parseExtensionFields (tagFile *const file, tagEntry *const entry,
 				const int key_len = colon - key;
 				*colon = '\0';
 
+				q_len = tail - q;
+
 				/* Unescaping */
 				while (*q != '\0')
 				{
@@ -380,6 +383,8 @@ static void parseExtensionFields (tagFile *const file, tagEntry *const entry,
 						memmove (q, next, q_len + 1);
 						if (p)
 							p -= skip - 1;
+						if (tail != string)
+							tail -= skip - 1;
 					}
 				}
 

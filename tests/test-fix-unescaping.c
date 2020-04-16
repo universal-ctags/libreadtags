@@ -155,6 +155,13 @@ main (void)
 	CHECK ("S", kind);
 	CHECK_X ("scope", "section:level2+");
 
+	NEXT ();
+	CHECK ("ClassFour", name);
+	CHECK ("input.php", file);
+	CHECK ("/^  use NS2\\\\{NS30 as NameSpaceTreePointO, NS31\\\\Cls4 as ClassFour};$/", address.pattern);
+	CHECK ("a", kind);
+	CHECK_X ("typeref", "unknown:NS2\\NS31\\Cls4");
+
 	r = tagsClose(t);
 	if (r != TagSuccess)
 	{
