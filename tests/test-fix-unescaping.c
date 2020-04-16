@@ -90,6 +90,7 @@ main (void)
 	CHECK ("/^%:$/", address.pattern);
 	CHECK ("t", kind);
 
+	r = tagsClose(t);
 	if (r != TagSuccess)
 	{
 		fprintf (stderr, "error in tagsClose\n");
