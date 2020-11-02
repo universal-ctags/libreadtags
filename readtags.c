@@ -698,6 +698,8 @@ static tagFile *initialize (const char *const filePath, tagFileInfo *const info)
 	free (result->line.buffer);
 	free (result->name.buffer);
 	free (result->fields.list);
+	if (result->fp)
+		fclose (result->fp);
 	free (result);
 	if (info)
 		info->status.opened = 0;
