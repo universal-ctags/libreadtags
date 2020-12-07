@@ -637,7 +637,11 @@ static int readPseudoTags (tagFile *const file, tagFileInfo *const info)
 	}
 	while (1)
 	{
-		fgetpos (file->fp, &startOfLine);
+		if (fgetpos (file->fp, &startOfLine) < 0)
+		{
+			err = errno;
+			break;
+		}
 		if (! readTagLineFull (file, &err))
 			break;
 		if (!isPseudoTagLine (file->line.buffer))
@@ -646,21 +650,53 @@ static int readPseudoTags (tagFile *const file, tagFileInfo *const info)
 		{
 			tagEntry entry;
 			const char *key, *value;
-			parseTagLine (file, &entry);
+			if (parseTagLine (file, &entry) != TagSuccess)
+			{
+				err = ENOMEM;
+				break;
+			}
 			key = entry.name + prefixLength;
 			value = entry.file;
 			if (strcmp (key, "TAG_FILE_SORTED") == 0)
-				file->sortMethod = (sortType) atoi (value);
+				file->sortMethod = (sortType) atoi (value); /* TODO */
 			else if (strcmp (key, "TAG_FILE_FORMAT") == 0)
-				file->format = (short) atoi (value);
+				file->format = (short) atoi (value); /* TODO */
 			else if (strcmp (key, "TAG_PROGRAM_AUTHOR") == 0)
+			{
 				file->program.author = duplicate (value);
+				if (value && file->program.author == NULL)
+				{
+					err = ENOMEM;
+					break;
+				}
+			}
 			else if (strcmp (key, "TAG_PROGRAM_NAME") == 0)
+			{
 				file->program.name = duplicate (value);
+				if (value && file->program.name == NULL)
+				{
+					err = ENOMEM;
+					break;
+				}
+			}
 			else if (strcmp (key, "TAG_PROGRAM_URL") == 0)
+			{
 				file->program.url = duplicate (value);
+				if (value && file->program.url == NULL)
+				{
+					err = ENOMEM;
+					break;
+				}
+			}
 			else if (strcmp (key, "TAG_PROGRAM_VERSION") == 0)
+			{
 				file->program.version = duplicate (value);
+				if (value && file->program.version == NULL)
+				{
+					err = ENOMEM;
+					break;
+				}
+			}
 			if (info != NULL)
 			{
 				info->file.format     = file->format;
@@ -672,7 +708,8 @@ static int readPseudoTags (tagFile *const file, tagFileInfo *const info)
 			}
 		}
 	}
-	fsetpos (file->fp, &startOfLine);
+	if (fsetpos (file->fp, &startOfLine) < 0)
+		err = errno;
 	return err;
 }
 
