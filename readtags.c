@@ -239,7 +239,7 @@ static tagResult growString (vstring *s)
 }
 
 /* Copy name of tag out of tag line */
-static void copyName (tagFile *const file)
+static tagResult copyName (tagFile *const file)
 {
 	size_t length;
 	const char *end = strchr (file->line.buffer, '\t');
@@ -254,9 +254,13 @@ static void copyName (tagFile *const file)
 	else
 		length = strlen (file->line.buffer);
 	while (length >= file->name.size)
-		growString (&file->name);
+	{
+		if (growString (&file->name) != TagSuccess)
+			return TagFailure;
+	}
 	strncpy (file->name.buffer, file->line.buffer, length);
 	file->name.buffer [length] = '\0';
+	return TagSuccess;
 }
 
 static int readTagLineRaw (tagFile *const file, int *err)
