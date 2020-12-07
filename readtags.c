@@ -375,8 +375,8 @@ static tagResult growFields (tagFile *const file)
 	return result;
 }
 
-static void parseExtensionFields (tagFile *const file, tagEntry *const entry,
-								  char *const string)
+static tagResult parseExtensionFields (tagFile *const file, tagEntry *const entry,
+									   char *const string)
 {
 	char *p = string;
 	char *tail = string + (string? strlen(string):0);
@@ -442,7 +442,10 @@ static void parseExtensionFields (tagFile *const file, tagEntry *const entry,
 				{
 				normalField:
 					if (entry->fields.count == file->fields.max)
-						growFields (file);
+					{
+						if (growFields (file) != TagSuccess)
+							return TagFailure;
+					}
 					file->fields.list [entry->fields.count].key = key;
 					file->fields.list [entry->fields.count].value = value;
 					++entry->fields.count;
@@ -450,6 +453,7 @@ static void parseExtensionFields (tagFile *const file, tagEntry *const entry,
 			}
 		}
 	}
+	return TagSuccess;
 }
 
 static int isOdd (unsigned int i)
@@ -472,7 +476,7 @@ static unsigned int countContinuousBackslashesBackward(const char *from,
 	return counter;
 }
 
-static void parseTagLine (tagFile *file, tagEntry *const entry)
+static tagResult parseTagLine (tagFile *file, tagEntry *const entry)
 {
 	int i;
 	char *p = file->line.buffer;
@@ -583,7 +587,10 @@ static void parseTagLine (tagFile *file, tagEntry *const entry)
 				fieldsPresent = (strncmp (p, ";\"", 2) == 0);
 				*p = '\0';
 				if (fieldsPresent)
-					parseExtensionFields (file, entry, p + 2);
+				{
+					if (parseExtensionFields (file, entry, p + 2) != TagSuccess)
+						return TagFailure;
+				}
 			}
 		}
 	}
@@ -594,6 +601,7 @@ static void parseTagLine (tagFile *file, tagEntry *const entry)
 		file->fields.list [i].key = NULL;
 		file->fields.list [i].value = NULL;
 	}
+	return TagSuccess;
 }
 
 static char *duplicate (const char *str)
