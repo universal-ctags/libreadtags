@@ -210,9 +210,9 @@ static int tagncmp (const char *s1, const char *s2, size_t n)
 	return result;
 }
 
-static int growString (vstring *s)
+static tagResult growString (vstring *s)
 {
-	int result = 0;
+	tagResult result = TagFailure;
 	size_t newLength;
 	char *newLine;
 	if (s->size == 0)
@@ -233,7 +233,7 @@ static int growString (vstring *s)
 	{
 		s->buffer = newLine;
 		s->size = newLength;
-		result = 1;
+		result = TagSuccess;
 	}
 	return result;
 }
@@ -661,9 +661,9 @@ static tagFile *initialize (const char *const filePath, tagFileInfo *const info)
 	tagFile *result = (tagFile*) calloc ((size_t) 1, sizeof (tagFile));
 	if (result != NULL)
 	{
-		if (growString (&result->line) == 0)
+		if (growString (&result->line) != TagSuccess)
 			goto mem_error;
-		if (growString (&result->name) == 0)
+		if (growString (&result->name) != TagSuccess)
 			goto mem_error;
 		result->fields.max = 20;
 		result->fields.list = (tagExtensionField*) calloc (
