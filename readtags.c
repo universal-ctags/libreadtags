@@ -294,7 +294,11 @@ static int readTagLineRaw (tagFile *const file, int *err)
 					*pLastChar != '\n'  &&  *pLastChar != '\r')
 		{
 			/*  buffer overflow */
-			growString (&file->line);
+			if (growString (&file->line) != TagSuccess)
+			{
+				*err = ENOMEM;
+				result = 0;
+			}
 			fseek (file->fp, file->pos, SEEK_SET);
 			reReadLine = 1;
 		}
@@ -310,7 +314,13 @@ static int readTagLineRaw (tagFile *const file, int *err)
 		}
 	} while (reReadLine  &&  result);
 	if (result)
-		copyName (file);
+	{
+		if (copyName (file) != TagSuccess)
+		{
+			*err = ENOMEM;
+			result = 0;
+		}
+	}
 	return result;
 }
 
