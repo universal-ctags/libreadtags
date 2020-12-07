@@ -263,6 +263,10 @@ static tagResult copyName (tagFile *const file)
 	return TagSuccess;
 }
 
+/* Return 1 on success.
+ * Return 0 on failure or EOF.
+ * errno is set to *err unless EOF.
+ */
 static int readTagLineRaw (tagFile *const file, int *err)
 {
 	int result = 1;
@@ -279,6 +283,12 @@ static int readTagLineRaw (tagFile *const file, int *err)
 		char *line;
 
 		file->pos = ftell (file->fp);
+		if (file->pos < 0)
+		{
+			*err = errno;
+			result = 0;
+			break;
+		}
 		reReadLine = 0;
 		*pLastChar = '\0';
 		line = fgets (file->line.buffer, (int) file->line.size, file->fp);
@@ -299,7 +309,11 @@ static int readTagLineRaw (tagFile *const file, int *err)
 				*err = ENOMEM;
 				result = 0;
 			}
-			fseek (file->fp, file->pos, SEEK_SET);
+			if (fseek (file->fp, file->pos, SEEK_SET) < 0)
+			{
+				*err = errno;
+				result = 0;
+			}
 			reReadLine = 1;
 		}
 		else
@@ -324,6 +338,10 @@ static int readTagLineRaw (tagFile *const file, int *err)
 	return result;
 }
 
+/* Return 1 on success.
+ * Return 0 on failure or EOF.
+ * errno is set to *err unless EOF.
+ */
 static int readTagLineFull (tagFile *const file, int *err)
 {
 	int result;
