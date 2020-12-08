@@ -45,6 +45,11 @@ typedef enum {
 
 typedef enum { TagFailure = 0, TagSuccess = 1 } tagResult;
 
+typedef enum {
+	TagErrnoUnexpectedSortedMethod = -1, /* Unexpected sorted method */
+	TagErrnoUnexpectedFormat       = -2, /* Unexpected format number */
+} tagErrno;
+
 struct sTagFile;
 
 typedef struct sTagFile tagFile;
@@ -56,7 +61,8 @@ typedef struct {
 			/* was the tag file successfully opened? */
 		int opened;
 
-			/* errno value when 'opened' is false */
+			/* errno value or tagErrno typed value
+			   when 'opened' is false */
 		int error_number;
 	} status;
 
@@ -149,12 +155,14 @@ typedef struct {
 *  null) pointer to a structure which, if not null, will be populated with
 *  information about the tag file. If successful, the function will return a
 *  handle which must be supplied to other calls to read information from the
-*  tag file, and info.status.opened will be set to true. If unsuccessful,
-*  the function will return NULL, and
-*  info.status.opened will be set to false and info.status.error_number will
-*  be set to the errno value representing the system error preventing the tag
-*  file from being successfully opened. The error_number will be ENOMEM if the
-*  memory allocation for the handle is failed.
+*  tag file, and info.status.opened will be set to true.
+*  If unsuccessful, the function will return NULL, and
+*  info.status.opened will be set to false and
+*  info.status.error_number will be set to either the errno value
+*  representing the system error preventing the tag file from being
+*  successfully opened, or the tagErrno typed value representing the
+*  library level error. The error_number will be ENOMEM if the memory
+*  allocation for the handle is failed.
 */
 extern tagFile *tagsOpen (const char *const filePath, tagFileInfo *const info);
 

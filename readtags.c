@@ -621,10 +621,11 @@ static int isPseudoTagLine (const char *buffer)
 	return (strncmp (buffer, PseudoTagPrefix, PseudoTagPrefixLength) == 0);
 }
 
-static int readPseudoTags (tagFile *const file, tagFileInfo *const info)
+static tagResult readPseudoTags (tagFile *const file, tagFileInfo *const info)
 {
 	fpos_t startOfLine;
 	int err = 0;
+	tagResult result = TagSuccess;
 	const size_t prefixLength = strlen (PseudoTagPrefix);
 	if (info != NULL)
 	{
@@ -658,9 +659,27 @@ static int readPseudoTags (tagFile *const file, tagFileInfo *const info)
 			key = entry.name + prefixLength;
 			value = entry.file;
 			if (strcmp (key, "TAG_FILE_SORTED") == 0)
-				file->sortMethod = (sortType) atoi (value); /* TODO */
+			{
+				char *endptr = NULL;
+				long m = strtol (value, &endptr, 10);
+				if (*endptr != '\0' || m < 0 || m > 2)
+				{
+					err = TagErrnoUnexpectedSortedMethod;
+					break;
+				}
+				file->sortMethod = (sortType) m;
+			}
 			else if (strcmp (key, "TAG_FILE_FORMAT") == 0)
-				file->format = (short) atoi (value); /* TODO */
+			{
+				char *endptr = NULL;
+				long m = strtol (value, &endptr, 10);
+				if (*endptr != '\0' || m < 1 || m > 2)
+				{
+					err = TagErrnoUnexpectedFormat;
+					break;
+				}
+				file->format = (short) m;
+			}
 			else if (strcmp (key, "TAG_PROGRAM_AUTHOR") == 0)
 			{
 				file->program.author = duplicate (value);
@@ -710,7 +729,11 @@ static int readPseudoTags (tagFile *const file, tagFileInfo *const info)
 	}
 	if (fsetpos (file->fp, &startOfLine) < 0)
 		err = errno;
-	return err;
+
+	info->status.error_number = err;
+	if (err)
+		result = TagFailure;
+	return result;
 }
 
 static int doesFilePointPseudoTag (tagFile *const file, void *unused)
@@ -777,9 +800,7 @@ static tagFile *initialize (const char *const filePath, tagFileInfo *const info)
 		}
 		rewind (result->fp);
 
-		if (info)
-			info->status.error_number = readPseudoTags (result, info);
-		if (info && info->status.error_number)
+		if (info && (readPseudoTags (result, info) == TagFailure))
 			goto file_error;
 
 		if (info)
