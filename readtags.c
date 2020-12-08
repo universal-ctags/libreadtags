@@ -798,7 +798,12 @@ static tagFile *initialize (const char *const filePath, tagFileInfo *const info)
 				info->status.error_number = errno;
 			goto file_error;
 		}
-		rewind (result->fp);
+		if (fseek(result->fp, 0L, SEEK_SET) == -1)
+		{
+			if (info)
+				info->status.error_number = errno;
+			goto file_error;
+		}
 
 		if (info && (readPseudoTags (result, info) == TagFailure))
 			goto file_error;
