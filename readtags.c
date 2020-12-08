@@ -376,7 +376,7 @@ static tagResult growFields (tagFile *const file)
 }
 
 static tagResult parseExtensionFields (tagFile *const file, tagEntry *const entry,
-									   char *const string)
+									   char *const string, int *err)
 {
 	char *p = string;
 	char *tail = string + (string? strlen(string):0);
@@ -444,7 +444,10 @@ static tagResult parseExtensionFields (tagFile *const file, tagEntry *const entr
 					if (entry->fields.count == file->fields.max)
 					{
 						if (growFields (file) != TagSuccess)
+						{
+							*err = ENOMEM;
 							return TagFailure;
+						}
 					}
 					file->fields.list [entry->fields.count].key = key;
 					file->fields.list [entry->fields.count].value = value;
@@ -476,7 +479,7 @@ static unsigned int countContinuousBackslashesBackward(const char *from,
 	return counter;
 }
 
-static tagResult parseTagLine (tagFile *file, tagEntry *const entry)
+static tagResult parseTagLineFull (tagFile *file, tagEntry *const entry, int *err)
 {
 	int i;
 	char *p = file->line.buffer;
@@ -588,7 +591,7 @@ static tagResult parseTagLine (tagFile *file, tagEntry *const entry)
 				*p = '\0';
 				if (fieldsPresent)
 				{
-					if (parseExtensionFields (file, entry, p + 2) != TagSuccess)
+					if (parseExtensionFields (file, entry, p + 2, err) != TagSuccess)
 						return TagFailure;
 				}
 			}
@@ -602,6 +605,12 @@ static tagResult parseTagLine (tagFile *file, tagEntry *const entry)
 		file->fields.list [i].value = NULL;
 	}
 	return TagSuccess;
+}
+
+static tagResult parseTagLine (tagFile *file, tagEntry *const entry)
+{
+	int unused;
+	return parseTagLineFull (file, entry, &unused);
 }
 
 static char *duplicate (const char *str)
@@ -651,11 +660,8 @@ static tagResult readPseudoTags (tagFile *const file, tagFileInfo *const info)
 		{
 			tagEntry entry;
 			const char *key, *value;
-			if (parseTagLine (file, &entry) != TagSuccess)
-			{
-				err = ENOMEM;
+			if (parseTagLineFull (file, &entry, &err) != TagSuccess)
 				break;
-			}
 			key = entry.name + prefixLength;
 			value = entry.file;
 			if (strcmp (key, "TAG_FILE_SORTED") == 0)
