@@ -153,7 +153,7 @@ typedef struct {
 *  the function will return NULL, and
 *  info.status.opened will be set to false and info.status.error_number will
 *  be set to the errno value representing the system error preventing the tag
-*  file from being successfully opened. The error_number will be zero if the
+*  file from being successfully opened. The error_number will be ENOMEM if the
 *  memory allocation for the handle is failed.
 */
 extern tagFile *tagsOpen (const char *const filePath, tagFileInfo *const info);

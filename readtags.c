@@ -784,7 +784,7 @@ static tagFile *initialize (const char *const filePath, tagFileInfo *const info)
 	return result;
  mem_error:
 	if (info)
-		info->status.error_number = 0;
+		info->status.error_number = ENOMEM;
  file_error:
 	free (result->line.buffer);
 	free (result->name.buffer);
