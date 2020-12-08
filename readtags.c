@@ -736,50 +736,55 @@ static void gotoFirstLogicalTag (tagFile *const file)
 static tagFile *initialize (const char *const filePath, tagFileInfo *const info)
 {
 	tagFile *result = (tagFile*) calloc ((size_t) 1, sizeof (tagFile));
-	if (result != NULL)
+
+	if (result == NULL)
 	{
-		if (growString (&result->line) != TagSuccess)
-			goto mem_error;
-		if (growString (&result->name) != TagSuccess)
-			goto mem_error;
-		result->fields.max = 20;
-		result->fields.list = (tagExtensionField*) calloc (
-			result->fields.max, sizeof (tagExtensionField));
-		if (result->fields.list == NULL)
-			goto mem_error;
-		result->fp = fopen (filePath, "rb");
-		if (result->fp == NULL)
+		info->status.opened = 0;
+		info->status.error_number = ENOMEM;
+		return NULL;
+	}
+
+	if (growString (&result->line) != TagSuccess)
+		goto mem_error;
+	if (growString (&result->name) != TagSuccess)
+		goto mem_error;
+	result->fields.max = 20;
+	result->fields.list = (tagExtensionField*) calloc (
+		result->fields.max, sizeof (tagExtensionField));
+	if (result->fields.list == NULL)
+		goto mem_error;
+	result->fp = fopen (filePath, "rb");
+	if (result->fp == NULL)
+	{
+		if (info)
+			info->status.error_number = errno;
+		goto file_error;
+	}
+	else
+	{
+		if (fseek (result->fp, 0, SEEK_END) == -1)
 		{
 			if (info)
 				info->status.error_number = errno;
 			goto file_error;
 		}
-		else
+		result->size = ftell (result->fp);
+		if (result->size == -1)
 		{
-			if (fseek (result->fp, 0, SEEK_END) == -1)
-			{
-				if (info)
-					info->status.error_number = errno;
-				goto file_error;
-			}
-			result->size = ftell (result->fp);
-			if (result->size == -1)
-			{
-				if (info)
-					info->status.error_number = errno;
-				goto file_error;
-			}
-			rewind (result->fp);
-
 			if (info)
-				info->status.error_number = readPseudoTags (result, info);
-			if (info && info->status.error_number)
-				goto file_error;
-
-			if (info)
-				info->status.opened = 1;
-			result->initialized = 1;
+				info->status.error_number = errno;
+			goto file_error;
 		}
+		rewind (result->fp);
+
+		if (info)
+			info->status.error_number = readPseudoTags (result, info);
+		if (info && info->status.error_number)
+			goto file_error;
+
+		if (info)
+			info->status.opened = 1;
+		result->initialized = 1;
 	}
 	return result;
  mem_error:
