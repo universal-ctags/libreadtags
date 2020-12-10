@@ -434,7 +434,16 @@ static tagResult parseExtensionFields (tagFile *const file, tagEntry *const entr
 					else if (memcmp (key, "file", 4) == 0)
 						entry->fileScope = 1;
 					else if (memcmp (key, "line", 4) == 0)
-						entry->address.lineNumber = atol (value);
+					{
+						char *endptr = NULL;
+						long m = strtol (value, &endptr, 10);
+						if (*endptr != '\0' || m < 0)
+						{
+							*err = TagErrnoUnexpectedLineno;
+							return TagFailure;
+						}
+						entry->address.lineNumber = m;
+					}
 					else
 						goto normalField;
 				}

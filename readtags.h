@@ -48,6 +48,8 @@ typedef enum { TagFailure = 0, TagSuccess = 1 } tagResult;
 typedef enum {
 	TagErrnoUnexpectedSortedMethod = -1, /* Unexpected sorted method */
 	TagErrnoUnexpectedFormat       = -2, /* Unexpected format number */
+	TagErrnoUnexpectedLineno       = -3, /* Unexpected value for line: field
+										  * (Zero or a positive integer is expected.) */
 } tagErrno;
 
 struct sTagFile;
