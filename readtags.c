@@ -1120,7 +1120,7 @@ static tagResult findNextFull (tagFile *const file, tagEntry *const entry,
 	{
 		result = findSequentialFull (file, isAcceptable, data);
 		if (result == TagSuccess  &&  entry != NULL)
-			parseTagLine (file, entry);
+			result = parseTagLineFull (file, entry, &file->err);
 	}
 	return result;
 }
