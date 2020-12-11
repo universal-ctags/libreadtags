@@ -1135,17 +1135,24 @@ static tagResult findNext (tagFile *const file, tagEntry *const entry)
 
 static tagResult findPseudoTag (tagFile *const file, int rewindBeforeFinding, tagEntry *const entry)
 {
-	tagResult result = TagFailure;
-	if (file != NULL  &&  file->initialized)
+	if (file == NULL || (!file->initialized) || file->err)
 	{
-		if (rewindBeforeFinding)
-			rewind (file->fp);
-		result = findNextFull (file, entry,
-							   (file->sortMethod == TAG_SORTED || file->sortMethod == TAG_FOLDSORTED),
-							   doesFilePointPseudoTag,
-							   NULL);
+		file->err= TagErrnoInvalidArgument;;
+		return TagFailure;
 	}
-	return result;
+
+	if (rewindBeforeFinding)
+	{
+		if (fseek(file->fp, 0L, SEEK_SET) == -1)
+		{
+			file->err = errno;
+			return TagFailure;
+		}
+	}
+	return findNextFull (file, entry,
+						 (file->sortMethod == TAG_SORTED || file->sortMethod == TAG_FOLDSORTED),
+						 doesFilePointPseudoTag,
+						 NULL);
 }
 
 
