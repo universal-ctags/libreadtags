@@ -1219,10 +1219,12 @@ extern tagResult tagsFind (tagFile *const file, tagEntry *const entry,
 
 extern tagResult tagsFindNext (tagFile *const file, tagEntry *const entry)
 {
-	tagResult result = TagFailure;
-	if (file != NULL  &&  file->initialized)
-		result = findNext (file, entry);
-	return result;
+	if (file == NULL || !file->initialized || file->err)
+	{
+		file->err = TagErrnoInvalidArgument;
+		return TagFailure;
+	}
+	return findNext (file, entry);
 }
 
 extern tagResult tagsFirstPseudoTag (tagFile *const file, tagEntry *const entry)
