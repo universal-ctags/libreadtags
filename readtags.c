@@ -925,14 +925,21 @@ static const char *readFieldValue (
 
 static int readTagLineSeek (tagFile *const file, const off_t pos)
 {
-	int result = 0;
-	if (fseek (file->fp, pos, SEEK_SET) == 0)
+	if (fseek (file->fp, pos, SEEK_SET) < 0)
 	{
-		result = readTagLine (file);  /* read probable partial line */
-		if (pos > 0  &&  result)
-			result = readTagLine (file);  /* read complete line */
+		file->err = errno;
+		return 0;
 	}
-	return result;
+
+	/* read probable partial line */
+	if (!readTagLineFull (file, &file->err))
+		return 0;
+
+	/* read complete line */
+	if (pos > 0)
+		return readTagLineFull (file, &file->err);
+
+	return 1;
 }
 
 static int nameComparison (tagFile *const file)
