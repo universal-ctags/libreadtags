@@ -355,12 +355,6 @@ static int readTagLineFull (tagFile *const file, int *err)
 	return result;
 }
 
-static int readTagLine (tagFile *const file)
-{
-	int unused;
-	return readTagLineFull (file, &unused);
-}
-
 static tagResult growFields (tagFile *const file)
 {
 	tagResult result = TagFailure;
@@ -617,12 +611,6 @@ static tagResult parseTagLineFull (tagFile *file, tagEntry *const entry, int *er
 		file->fields.list [i].value = NULL;
 	}
 	return TagSuccess;
-}
-
-static tagResult parseTagLine (tagFile *file, tagEntry *const entry)
-{
-	int unused;
-	return parseTagLineFull (file, entry, &unused);
 }
 
 static char *duplicate (const char *str)
@@ -1014,6 +1002,8 @@ static tagResult findBinary (tagFile *const file)
 	{
 		if (! readTagLineSeek (file, pos))
 		{
+			if (file->err)
+				break;
 			/* in case we fell off end of file */
 			result = findFirstMatchBefore (file);
 			break;
@@ -1040,7 +1030,11 @@ static tagResult findBinary (tagFile *const file)
 			else if (pos == 0)
 				result = TagSuccess;
 			else
+			{
 				result = findFirstMatchBefore (file);
+				if (result != TagSuccess && file->err)
+					break;
+			}
 		}
 	}
 	return result;
@@ -1084,12 +1078,30 @@ static tagResult find (tagFile *const file, tagEntry *const entry,
 	if (file->search.name != NULL)
 		free (file->search.name);
 	file->search.name = duplicate (name);
+	if (file->search.name == NULL)
+	{
+		file->err = ENOMEM;
+		return TagFailure;
+	}
 	file->search.nameLength = strlen (name);
 	file->search.partial = (options & TAG_PARTIALMATCH) != 0;
 	file->search.ignorecase = (options & TAG_IGNORECASE) != 0;
-	fseek (file->fp, 0, SEEK_END);
+	if (fseek (file->fp, 0, SEEK_END) < 0)
+	{
+		file->err = errno;
+		return TagFailure;
+	}
 	file->size = ftell (file->fp);
-	rewind (file->fp);
+	if (file->size == -1)
+	{
+		file->err = errno;
+		return TagFailure;
+	}
+	if (fseek(file->fp, 0L, SEEK_SET) == -1)
+	{
+		file->err = errno;
+		return TagFailure;
+	}
 	if ((file->sortMethod == TAG_SORTED      && !file->search.ignorecase) ||
 		(file->sortMethod == TAG_FOLDSORTED  &&  file->search.ignorecase))
 	{
@@ -1097,6 +1109,8 @@ static tagResult find (tagFile *const file, tagEntry *const entry,
 		fputs ("<performing binary search>\n", stderr);
 #endif
 		result = findBinary (file);
+		if (result == TagFailure && file->err)
+			return TagFailure;
 	}
 	else
 	{
@@ -1104,6 +1118,8 @@ static tagResult find (tagFile *const file, tagEntry *const entry,
 		fputs ("<performing sequential search>\n", stderr);
 #endif
 		result = findSequential (file);
+		if (result == TagFailure && file->err)
+			return TagFailure;
 	}
 
 	if (result != TagSuccess)
@@ -1111,8 +1127,9 @@ static tagResult find (tagFile *const file, tagEntry *const entry,
 	else
 	{
 		file->search.pos = file->pos;
-		if (entry != NULL)
-			parseTagLine (file, entry);
+		result = (entry != NULL)
+			? parseTagLineFull (file, entry, &file->err)
+			: TagSuccess;
 	}
 	return result;
 }
