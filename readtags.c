@@ -345,7 +345,7 @@ static int readTagLineRaw (tagFile *const file, int *err)
  * Return 0 on failure or EOF.
  * errno is set to *err unless EOF.
  */
-static int readTagLineFull (tagFile *const file, int *err)
+static int readTagLine (tagFile *const file, int *err)
 {
 	int result;
 	do
@@ -485,7 +485,7 @@ static unsigned int countContinuousBackslashesBackward(const char *from,
 	return counter;
 }
 
-static tagResult parseTagLineFull (tagFile *file, tagEntry *const entry, int *err)
+static tagResult parseTagLine (tagFile *file, tagEntry *const entry, int *err)
 {
 	int i;
 	char *p = file->line.buffer;
@@ -652,7 +652,7 @@ static tagResult readPseudoTags (tagFile *const file, tagFileInfo *const info)
 			err = errno;
 			break;
 		}
-		if (! readTagLineFull (file, &err))
+		if (! readTagLine (file, &err))
 			break;
 		if (!isPseudoTagLine (file->line.buffer))
 			break;
@@ -660,7 +660,7 @@ static tagResult readPseudoTags (tagFile *const file, tagFileInfo *const info)
 		{
 			tagEntry entry;
 			const char *key, *value;
-			if (parseTagLineFull (file, &entry, &err) != TagSuccess)
+			if (parseTagLine (file, &entry, &err) != TagSuccess)
 				break;
 			key = entry.name + prefixLength;
 			value = entry.file;
@@ -764,7 +764,7 @@ static tagResult gotoFirstLogicalTag (tagFile *const file)
 			file->err = errno;
 			return TagFailure;
 		}
-		if (! readTagLineFull (file, &file->err))
+		if (! readTagLine (file, &file->err))
 		{
 			if (file->err)
 				return TagFailure;
@@ -885,12 +885,12 @@ static tagResult readNext (tagFile *const file, tagEntry *const entry)
 		file->err = TagErrnoInvalidArgument;
 		result = TagFailure;
 	}
-	else if (! readTagLineFull (file, &file->err))
+	else if (! readTagLine (file, &file->err))
 		result = TagFailure;
 	else
 	{
 		result = (entry != NULL)
-			? parseTagLineFull (file, entry, &file->err)
+			? parseTagLine (file, entry, &file->err)
 			: TagSuccess;
 	}
 	return result;
@@ -920,12 +920,12 @@ static int readTagLineSeek (tagFile *const file, const off_t pos)
 	}
 
 	/* read probable partial line */
-	if (!readTagLineFull (file, &file->err))
+	if (!readTagLine (file, &file->err))
 		return 0;
 
 	/* read complete line */
 	if (pos > 0)
-		return readTagLineFull (file, &file->err);
+		return readTagLine (file, &file->err);
 
 	return 1;
 }
@@ -982,7 +982,7 @@ static tagResult findFirstMatchBefore (tagFile *const file)
 		return TagFailure;
 	do
 	{
-		more_lines = readTagLineFull (file, &file->err);
+		more_lines = readTagLine (file, &file->err);
 		if (more_lines == 0 && file->err)
 			return TagFailure;
 		if (nameComparison (file) == 0)
@@ -1053,7 +1053,7 @@ static tagResult findSequentialFull (tagFile *const file,
 	tagResult result = TagFailure;
 	while (result == TagFailure)
 	{
-		if (! readTagLineFull (file, &file->err))
+		if (! readTagLine (file, &file->err))
 			break;
 		if (isAcceptable (file, data))
 			result = TagSuccess;
@@ -1128,7 +1128,7 @@ static tagResult find (tagFile *const file, tagEntry *const entry,
 	{
 		file->search.pos = file->pos;
 		result = (entry != NULL)
-			? parseTagLineFull (file, entry, &file->err)
+			? parseTagLine (file, entry, &file->err)
 			: TagSuccess;
 	}
 	return result;
@@ -1150,7 +1150,7 @@ static tagResult findNextFull (tagFile *const file, tagEntry *const entry,
 	{
 		result = findSequentialFull (file, isAcceptable, data);
 		if (result == TagSuccess  &&  entry != NULL)
-			result = parseTagLineFull (file, entry, &file->err);
+			result = parseTagLine (file, entry, &file->err);
 	}
 	return result;
 }
