@@ -281,13 +281,9 @@ static int readTagLineRaw (tagFile *const file, int *err)
 		if (line == NULL)
 		{
 			/* read error */
-			if (err)
-				*err = 0;
+			*err = 0;
 			if (! feof (file->fp))
-			{
-				if (err)
-					*err = errno;
-			}
+				*err = errno;
 			result = 0;
 		}
 		else if (*pLastChar != '\0'  &&
@@ -326,7 +322,8 @@ static int readTagLineFull (tagFile *const file, int *err)
 
 static int readTagLine (tagFile *const file)
 {
-	return readTagLineFull (file, NULL);
+	int unused;
+	return readTagLineFull (file, &unused);
 }
 
 static tagResult growFields (tagFile *const file)
