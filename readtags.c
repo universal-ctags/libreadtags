@@ -893,14 +893,17 @@ static tagResult readNext (tagFile *const file, tagEntry *const entry)
 {
 	tagResult result;
 	if (file == NULL  ||  ! file->initialized)
+	{
+		file->err = TagErrnoInvalidArgument;
 		result = TagFailure;
-	else if (! readTagLine (file))
+	}
+	else if (! readTagLineFull (file, &file->err))
 		result = TagFailure;
 	else
 	{
-		if (entry != NULL)
-			parseTagLine (file, entry);
-		result = TagSuccess;
+		result = (entry != NULL)
+			? parseTagLineFull (file, entry, &file->err)
+			: TagSuccess;
 	}
 	return result;
 }
@@ -1163,22 +1166,26 @@ extern tagResult tagsSetSortType (tagFile *const file, const sortType type)
 
 extern tagResult tagsFirst (tagFile *const file, tagEntry *const entry)
 {
-	tagResult result = TagFailure;
-	if (file != NULL  &&  file->initialized)
+	if (file == NULL || (!file->initialized) || file->err)
 	{
-		if (gotoFirstLogicalTag (file) != TagSuccess)
-			return TagFailure;
-		result = readNext (file, entry);
+		file->err = TagErrnoInvalidArgument;
+		return TagFailure;
 	}
-	return result;
+
+	if (gotoFirstLogicalTag (file) != TagSuccess)
+		return TagFailure;
+	return readNext (file, entry);
 }
 
 extern tagResult tagsNext (tagFile *const file, tagEntry *const entry)
 {
-	tagResult result = TagFailure;
-	if (file != NULL  &&  file->initialized)
-		result = readNext (file, entry);
-	return result;
+	if (file == NULL || (!file->initialized) || file->err)
+	{
+		file->err = TagErrnoInvalidArgument;
+		return TagFailure;
+	}
+
+	return readNext (file, entry);
 }
 
 extern const char *tagsField (const tagEntry *const entry, const char *const key)

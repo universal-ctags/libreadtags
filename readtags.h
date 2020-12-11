@@ -50,6 +50,8 @@ typedef enum {
 	TagErrnoUnexpectedFormat       = -2, /* Unexpected format number */
 	TagErrnoUnexpectedLineno       = -3, /* Unexpected value for line: field
 										  * (Zero or a positive integer is expected.) */
+	TagErrnoInvalidArgument        = -4, /* Unexpected argument passed to the API
+										  * function */
 } tagErrno;
 
 struct sTagFile;
