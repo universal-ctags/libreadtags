@@ -759,19 +759,38 @@ static int doesFilePointPseudoTag (tagFile *const file, void *unused)
 	return isPseudoTagLine (file->name.buffer);
 }
 
-static void gotoFirstLogicalTag (tagFile *const file)
+static tagResult gotoFirstLogicalTag (tagFile *const file)
 {
 	fpos_t startOfLine;
-	rewind (file->fp);
+
+	if (fseek(file->fp, 0L, SEEK_SET) == -1)
+	{
+		file->err = errno;
+		return TagFailure;
+	}
+
 	while (1)
 	{
-		fgetpos (file->fp, &startOfLine);
-		if (! readTagLine (file))
+		if (fgetpos (file->fp, &startOfLine) < 0)
+		{
+			file->err = errno;
+			return TagFailure;
+		}
+		if (! readTagLineFull (file, &file->err))
+		{
+			if (file->err)
+				return TagFailure;
 			break;
+		}
 		if (!isPseudoTagLine (file->line.buffer))
 			break;
 	}
-	fsetpos (file->fp, &startOfLine);
+	if (fsetpos (file->fp, &startOfLine) < 0)
+	{
+		file->err = errno;
+		return TagFailure;
+	}
+	return TagSuccess;
 }
 
 static tagFile *initialize (const char *const filePath, tagFileInfo *const info)
@@ -1147,7 +1166,8 @@ extern tagResult tagsFirst (tagFile *const file, tagEntry *const entry)
 	tagResult result = TagFailure;
 	if (file != NULL  &&  file->initialized)
 	{
-		gotoFirstLogicalTag (file);
+		if (gotoFirstLogicalTag (file) != TagSuccess)
+			return TagFailure;
 		result = readNext (file, entry);
 	}
 	return result;
