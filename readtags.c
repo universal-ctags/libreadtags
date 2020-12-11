@@ -964,7 +964,7 @@ static int nameComparison (tagFile *const file)
 	return result;
 }
 
-static void findFirstNonMatchBefore (tagFile *const file)
+static tagResult findFirstNonMatchBefore (tagFile *const file)
 {
 #define JUMP_BACK 512
 	int more_lines;
@@ -978,8 +978,11 @@ static void findFirstNonMatchBefore (tagFile *const file)
 		else
 			pos = pos - JUMP_BACK;
 		more_lines = readTagLineSeek (file, pos);
+		if (more_lines == 0 && file->err)
+			return TagFailure;
 		comp = nameComparison (file);
 	} while (more_lines  &&  comp == 0  &&  pos > 0  &&  pos < start);
+	return TagSuccess;
 }
 
 static tagResult findFirstMatchBefore (tagFile *const file)
@@ -987,10 +990,13 @@ static tagResult findFirstMatchBefore (tagFile *const file)
 	tagResult result = TagFailure;
 	int more_lines;
 	off_t start = file->pos;
-	findFirstNonMatchBefore (file);
+	if (findFirstNonMatchBefore (file) != TagSuccess)
+		return TagFailure;
 	do
 	{
-		more_lines = readTagLine (file);
+		more_lines = readTagLineFull (file, &file->err);
+		if (more_lines == 0 && file->err)
+			return TagFailure;
 		if (nameComparison (file) == 0)
 			result = TagSuccess;
 	} while (more_lines  &&  result != TagSuccess  &&  file->pos < start);
