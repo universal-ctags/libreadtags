@@ -1037,14 +1037,19 @@ static tagResult findSequentialFull (tagFile *const file,
 									 int (* isAcceptable) (tagFile *const, void *),
 									 void *data)
 {
-	tagResult result = TagFailure;
-	if (file->initialized)
+	if (file == NULL || !file->initialized || file->err)
 	{
-		while (result == TagFailure  &&  readTagLine (file))
-		{
-			if (isAcceptable (file, data))
-				result = TagSuccess;
-		}
+		file->err = TagErrnoInvalidArgument;
+		return TagFailure;
+	}
+
+	tagResult result = TagFailure;
+	while (result == TagFailure)
+	{
+		if (! readTagLineFull (file, &file->err))
+			break;
+		if (isAcceptable (file, data))
+			result = TagSuccess;
 	}
 	return result;
 }
