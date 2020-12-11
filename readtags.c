@@ -1251,10 +1251,12 @@ extern const char *tagsField (const tagEntry *const entry, const char *const key
 extern tagResult tagsFind (tagFile *const file, tagEntry *const entry,
 						   const char *const name, const int options)
 {
-	tagResult result = TagFailure;
-	if (file != NULL  &&  file->initialized)
-		result = find (file, entry, name, options);
-	return result;
+	if (file == NULL || !file->initialized || file->err)
+	{
+		file->err = TagErrnoInvalidArgument;
+		return TagFailure;
+	}
+	return find (file, entry, name, options);
 }
 
 extern tagResult tagsFindNext (tagFile *const file, tagEntry *const entry)
