@@ -81,6 +81,9 @@ struct sTagFile {
 			/* program version */
 		char *version;
 	} program;
+		/* 0 (initial state set by calloc), errno value,
+		 * or tagErrno typed value */
+	int err;
 };
 
 /*
