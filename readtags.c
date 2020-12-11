@@ -1167,13 +1167,23 @@ extern tagFile *tagsOpen (const char *const filePath, tagFileInfo *const info)
 
 extern tagResult tagsSetSortType (tagFile *const file, const sortType type)
 {
-	tagResult result = TagFailure;
-	if (file != NULL  &&  file->initialized)
+	if (file == NULL || (!file->initialized) || file->err)
 	{
-		file->sortMethod = type;
-		result = TagSuccess;
+		file->err = TagErrnoInvalidArgument;
+		return TagFailure;
 	}
-	return result;
+
+	switch (type)
+	{
+	case TAG_UNSORTED:
+	case TAG_SORTED:
+	case TAG_FOLDSORTED:
+		file->sortMethod = type;
+		return TagSuccess;
+	default:
+		file->err = TagErrnoUnexpectedSortedMethod;
+		return TagFailure;
+	}
 }
 
 extern tagResult tagsFirst (tagFile *const file, tagEntry *const entry)
