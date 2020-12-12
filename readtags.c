@@ -1289,3 +1289,10 @@ extern tagResult tagsClose (tagFile *const file)
 	}
 	return result;
 }
+
+extern int tagsGetErrno (tagFile *const file)
+{
+	if (file == NULL)
+		return TagErrnoInvalidArgument;
+	return file->err;
+}

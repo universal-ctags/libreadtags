@@ -269,6 +269,18 @@ extern tagResult tagsNextPseudoTag (tagFile *const file, tagEntry *const entry);
 */
 extern tagResult tagsClose (tagFile *const file);
 
+/*
+*  Get the error status set in the last API call.
+*  Much of the API functions return TagFailure because (1) no tag is
+*  found, or (2) an error occurs. tagsGetErrno() is for distinguishing
+*  (1) or (2). This function will return 0 for (1). The errno value
+*  representing the system error or tagErrno value for (2).
+*
+*  This function does not deal with the results of tagsOpen(),
+*  tagsClose(), and tagsField().
+*/
+extern int tagsGetErrno (tagFile *const file);
+
 #ifdef __cplusplus
 };
 #endif
