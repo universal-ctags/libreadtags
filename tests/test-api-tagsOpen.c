@@ -184,5 +184,57 @@ main (void)
 	}
 	fprintf (stderr, "ok\n");
 
+	fprintf (stderr, "opening an broken tags file (format: unexpected number)...");
+	t = tagsOpen ("./api-tagsOpen-wrong-format-num.tags", &info);
+	if (t)
+	{
+		fprintf (stderr, "opened well unexpectedly (NULL)\n");
+		return 1;
+	}
+	else if (info.status.error_number != TagErrnoUnexpectedFormat)
+	{
+		fprintf (stderr, "unexpected error (!= TagErrnoUnexpectedFormat)\n");
+	}
+	fprintf (stderr, "ok\n");
+
+	fprintf (stderr, "opening an broken tags file (format: not a number)...");
+	t = tagsOpen ("./api-tagsOpen-wrong-format-nonum.tags", &info);
+	if (t)
+	{
+		fprintf (stderr, "opened well unexpectedly (NULL)\n");
+		return 1;
+	}
+	else if (info.status.error_number != TagErrnoUnexpectedFormat)
+	{
+		fprintf (stderr, "unexpected error (!= TagErrnoUnexpectedFormat)\n");
+	}
+	fprintf (stderr, "ok\n");
+
+	fprintf (stderr, "opening an broken tags file (sort: unexpected number)...");
+	t = tagsOpen ("./api-tagsOpen-wrong-sort-method-num.tags", &info);
+	if (t)
+	{
+		fprintf (stderr, "opened well unexpectedly (NULL)\n");
+		return 1;
+	}
+	else if (info.status.error_number != TagErrnoUnexpectedSortedMethod)
+	{
+		fprintf (stderr, "unexpected error (!= TagErrnoUnexpectedSortedMethod)\n");
+	}
+	fprintf (stderr, "ok\n");
+
+	fprintf (stderr, "opening an broken tags file (sort: not a number)...");
+	t = tagsOpen ("./api-tagsOpen-wrong-sort-method-nonum.tags", &info);
+	if (t)
+	{
+		fprintf (stderr, "opened well unexpectedly (NULL)\n");
+		return 1;
+	}
+	else if (info.status.error_number != TagErrnoUnexpectedSortedMethod)
+	{
+		fprintf (stderr, "unexpected error (!= TagErrnoUnexpectedSortedMethod)\n");
+	}
+	fprintf (stderr, "ok\n");
+
 	return 0;
 }

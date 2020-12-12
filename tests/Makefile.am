@@ -32,6 +32,10 @@ LDADD = $(top_builddir)/libreadtags.la
 test_api_tagsOpen = test-api-tagsOpen.c
 test_api_tagsOpen_DEPENDENCIES = $(DEPS)
 EXTRA_DIST += api-tagsOpen-ectags.tags
+EXTRA_DIST += api-tagsOpen-wrong-format-nonum.tags
+EXTRA_DIST += api-tagsOpen-wrong-format-num.tags
+EXTRA_DIST += api-tagsOpen-wrong-sort-method-nonum.tags
+EXTRA_DIST += api-tagsOpen-wrong-sort-method-num.tags
 
 test_api_tagsFind = test-api-tagsFind.c
 test_api_tagsFind_DEPENDENCIES = $(DEPS)
