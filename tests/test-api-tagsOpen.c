@@ -236,5 +236,41 @@ main (void)
 	}
 	fprintf (stderr, "ok\n");
 
+
+	const char* broken_PROGRAM_AUTHOR [6] = {
+		"Universal Ctags Team",
+		"Universal Ctags Team",
+		"",
+		NULL,
+		NULL,
+		NULL,
+	};
+	for (int i = 0; i < 6; i++)
+	{
+		char tagf_name_tmpl [] = "./api-tagsOpen-incomplete-program-author-%d.tags";
+		char tagf_name [sizeof (tagf_name_tmpl)];
+		fprintf (stderr, "opening a tags file with incomplete PROGRAM_AUTHOR field [trimming level: %d]...", i);
+		sprintf (tagf_name, tagf_name_tmpl, i);
+		t = tagsOpen (tagf_name, &info);
+		if (t == NULL)
+		{
+			fprintf (stderr, "unexpected error: %d %s\n", info.status.error_number,
+					 info.status.error_number > 0
+					 ? strerror (info.status.error_number)
+					 : "");
+			return 1;
+		}
+		if (!((broken_PROGRAM_AUTHOR [i] == info.program.author)
+			  || (broken_PROGRAM_AUTHOR [i]
+				  && info.program.author
+				  && strcmp (broken_PROGRAM_AUTHOR [i], info.program.author)) == 0))
+		{
+			fprintf (stderr, "unexpected value: %s (!= %s)\n",
+					 info.program.author? info.program.author: "(null)",
+					 broken_PROGRAM_AUTHOR [i]? broken_PROGRAM_AUTHOR [i]: "(null)");
+			return 1;
+		}
+	}
+
 	return 0;
 }

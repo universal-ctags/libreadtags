@@ -36,6 +36,12 @@ EXTRA_DIST += api-tagsOpen-wrong-format-nonum.tags
 EXTRA_DIST += api-tagsOpen-wrong-format-num.tags
 EXTRA_DIST += api-tagsOpen-wrong-sort-method-nonum.tags
 EXTRA_DIST += api-tagsOpen-wrong-sort-method-num.tags
+EXTRA_DIST += api-tagsOpen-incomplete-program-author-0.tags
+EXTRA_DIST += api-tagsOpen-incomplete-program-author-1.tags
+EXTRA_DIST += api-tagsOpen-incomplete-program-author-2.tags
+EXTRA_DIST += api-tagsOpen-incomplete-program-author-3.tags
+EXTRA_DIST += api-tagsOpen-incomplete-program-author-4.tags
+EXTRA_DIST += api-tagsOpen-incomplete-program-author-5.tags
 
 test_api_tagsFind = test-api-tagsFind.c
 test_api_tagsFind_DEPENDENCIES = $(DEPS)
