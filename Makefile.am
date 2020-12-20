@@ -5,6 +5,7 @@ AM_CFLAGS=-Wall
 
 lib_LTLIBRARIES    = libreadtags.la
 libreadtags_la_LDFLAGS = -no-undefined -version-info $(LT_VERSION)
+libreadtags_la_CFLAGS  = $(GCOV_CFLAGS)
 
 libreadtags_la_SOURCES = readtags.c readtags.h
 nobase_include_HEADERS = readtags.h

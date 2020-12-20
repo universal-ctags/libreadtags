@@ -23,6 +23,7 @@ check_PROGRAMS = \
 EXTRA_DIST =
 
 AM_CPPFLAGS = -I $(top_srcdir)
+AM_CFLAGS = $(GCOV_CFLAGS)
 DEPS = $(top_builddir)/libreadtags.la
 LDADD = $(top_builddir)/libreadtags.la
 

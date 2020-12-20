@@ -251,9 +251,9 @@ extern tagResult tagsFirstPseudoTag (tagFile *const file, tagEntry *const entry)
 extern tagResult tagsNextPseudoTag (tagFile *const file, tagEntry *const entry);
 
 /*
-*  Call tagsTerminate() at completion of reading the tag file, which will
+*  Call tagsClose() at completion of reading the tag file, which will
 *  close the file and free any internal memory allocated. The function will
-*  return TagFailure is no file is currently open, TagSuccess otherwise.
+*  return TagFailure if no file is currently open, TagSuccess otherwise.
 */
 extern tagResult tagsClose (tagFile *const file);
 
