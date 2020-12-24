@@ -636,15 +636,14 @@ static tagResult readPseudoTags (tagFile *const file, tagFileInfo *const info)
 	int err = 0;
 	tagResult result = TagSuccess;
 	const size_t prefixLength = strlen (PseudoTagPrefix);
-	if (info != NULL)
-	{
-		info->file.format     = 1;
-		info->file.sort       = TAG_UNSORTED;
-		info->program.author  = NULL;
-		info->program.name    = NULL;
-		info->program.url     = NULL;
-		info->program.version = NULL;
-	}
+
+	info->file.format     = 1;
+	info->file.sort       = TAG_UNSORTED;
+	info->program.author  = NULL;
+	info->program.name    = NULL;
+	info->program.url     = NULL;
+	info->program.version = NULL;
+
 	while (1)
 	{
 		if (fgetpos (file->fp, &startOfLine) < 0)
@@ -722,15 +721,13 @@ static tagResult readPseudoTags (tagFile *const file, tagFileInfo *const info)
 					break;
 				}
 			}
-			if (info != NULL)
-			{
-				info->file.format     = file->format;
-				info->file.sort       = file->sortMethod;
-				info->program.author  = file->program.author;
-				info->program.name    = file->program.name;
-				info->program.url     = file->program.url;
-				info->program.version = file->program.version;
-			}
+
+			info->file.format     = file->format;
+			info->file.sort       = file->sortMethod;
+			info->program.author  = file->program.author;
+			info->program.name    = file->program.name;
+			info->program.url     = file->program.url;
+			info->program.version = file->program.version;
 		}
 	}
 	if (fsetpos (file->fp, &startOfLine) < 0)
@@ -804,43 +801,37 @@ static tagFile *initialize (const char *const filePath, tagFileInfo *const info)
 	result->fp = fopen (filePath, "rb");
 	if (result->fp == NULL)
 	{
-		if (info)
-			info->status.error_number = errno;
+		info->status.error_number = errno;
 		goto file_error;
 	}
 	else
 	{
 		if (fseek (result->fp, 0, SEEK_END) == -1)
 		{
-			if (info)
-				info->status.error_number = errno;
+			info->status.error_number = errno;
 			goto file_error;
 		}
 		result->size = ftell (result->fp);
 		if (result->size == -1)
 		{
-			if (info)
-				info->status.error_number = errno;
+			info->status.error_number = errno;
 			goto file_error;
 		}
 		if (fseek(result->fp, 0L, SEEK_SET) == -1)
 		{
-			if (info)
-				info->status.error_number = errno;
+			info->status.error_number = errno;
 			goto file_error;
 		}
 
-		if (info && (readPseudoTags (result, info) == TagFailure))
+		if (readPseudoTags (result, info) == TagFailure)
 			goto file_error;
 
-		if (info)
-			info->status.opened = 1;
+		info->status.opened = 1;
 		result->initialized = 1;
 	}
 	return result;
  mem_error:
-	if (info)
-		info->status.error_number = ENOMEM;
+	info->status.error_number = ENOMEM;
  file_error:
 	free (result->line.buffer);
 	free (result->name.buffer);
@@ -848,8 +839,7 @@ static tagFile *initialize (const char *const filePath, tagFileInfo *const info)
 	if (result->fp)
 		fclose (result->fp);
 	free (result);
-	if (info)
-		info->status.opened = 0;
+	info->status.opened = 0;
 	return NULL;
 }
 
@@ -1192,7 +1182,8 @@ static tagResult findPseudoTag (tagFile *const file, int rewindBeforeFinding, ta
 
 extern tagFile *tagsOpen (const char *const filePath, tagFileInfo *const info)
 {
-	return initialize (filePath, info);
+	tagFileInfo infoDummy;
+	return initialize (filePath, info? info: &infoDummy);
 }
 
 extern tagResult tagsSetSortType (tagFile *const file, const sortType type)
