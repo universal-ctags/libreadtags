@@ -123,8 +123,13 @@ check_finding0 (tagFile *t, const char *name, const int options,
 		fprintf (stderr, "ok\n");
 	}
 
+	fprintf (stderr, "verifying no remain....");
 	if (tagsFindNext (t, &e) == TagSuccess)
+	{
+		fprintf (stderr, "still existing\n");
 		return 1;
+	}
+	fprintf (stderr, "ok\n");
 
 	return 0;
 }
