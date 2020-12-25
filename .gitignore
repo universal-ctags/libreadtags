@@ -32,6 +32,7 @@ test-driver
 tests/*.log
 tests/*.trs
 tests/test-api-tagsFind
+tests/test-api-tagsFirst
 tests/test-api-tagsFirstPseudoTag
 tests/test-api-tagsOpen
 tests/test-fix-null-deref
