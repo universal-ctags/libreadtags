@@ -30,7 +30,14 @@ extern "C" {
 /* Options for tagsSetSortType() */
 typedef enum {
 	TAG_UNSORTED, TAG_SORTED, TAG_FOLDSORTED
-} sortType ;
+} tagSortType ;
+
+/* For source code level compatibility, sortType is defined here.
+*  Define TAG_NO_COMPAT_SORT_TYPE if you want to avoid namespace pollution.
+*/
+#ifndef TAG_NO_COMPAT_SORT_TYPE
+#define sortType tagSortType
+#endif
 
 /* Options for tagsFind() */
 #define TAG_FULLMATCH     0x0
@@ -76,7 +83,7 @@ typedef struct {
 			short format;
 
 				/* how is the tag file sorted? */
-			sortType sort;
+			tagSortType sort;
 	} file;
 
 
@@ -183,7 +190,7 @@ extern tagFile *tagsOpen (const char *const filePath, tagFileInfo *const info);
 *  it actually is not. The function will return TagSuccess if called on an
 *  open tag file or TagFailure if not.
 */
-extern tagResult tagsSetSortType (tagFile *const file, const sortType type);
+extern tagResult tagsSetSortType (tagFile *const file, const tagSortType type);
 
 /*
 *  Reads the first tag in the file, if any. It is passed the handle to an

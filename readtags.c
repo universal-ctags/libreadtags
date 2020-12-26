@@ -39,7 +39,7 @@ struct sTagFile {
 		/* format of tag file */
 	short format;
 		/* how is the tag file sorted? */
-	sortType sortMethod;
+	tagSortType sortMethod;
 		/* pointer to file structure */
 	FILE* fp;
 		/* file position of first character of `line' */
@@ -672,7 +672,7 @@ static tagResult readPseudoTags (tagFile *const file, tagFileInfo *const info)
 					err = TagErrnoUnexpectedSortedMethod;
 					break;
 				}
-				file->sortMethod = (sortType) m;
+				file->sortMethod = (tagSortType) m;
 			}
 			else if (strcmp (key, "TAG_FILE_FORMAT") == 0)
 			{
@@ -1186,7 +1186,7 @@ extern tagFile *tagsOpen (const char *const filePath, tagFileInfo *const info)
 	return initialize (filePath, info? info: &infoDummy);
 }
 
-extern tagResult tagsSetSortType (tagFile *const file, const sortType type)
+extern tagResult tagsSetSortType (tagFile *const file, const tagSortType type)
 {
 	if (file == NULL || (!file->initialized) || file->err)
 	{
