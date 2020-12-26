@@ -31,7 +31,7 @@ check_iterating0 (tagFile *t, struct expectation *expectations, int count)
 
 	for (int i = 0; i < count; i++)
 	{
-		fprintf (stderr, "[%d/%d] interating ptags...", i + 1, count);
+		fprintf (stderr, "[%d/%d] iterating ptags...", i + 1, count);
 		if (i == 0)
 		{
 			if (tagsFirstPseudoTag (t, &e) != TagSuccess)
