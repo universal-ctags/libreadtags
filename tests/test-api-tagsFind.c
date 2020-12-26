@@ -33,25 +33,21 @@ check_finding0 (tagFile *t, const char *name, const int options,
 {
 	tagEntry e;
 	struct expectation *x;
+	int err;
 
 	for (int i = 0; i < count; i++)
 	{
 		fprintf (stderr, "[%d/%d] finding \"%s\" (%d)...", i + 1, count, name, options);
-		if (i == 0)
+		tagResult r = (i == 0)
+			? tagsFind (t, &e, name, options)
+			: tagsFindNext (t, &e);
+		if (r != TagSuccess)
 		{
-			if (tagsFind (t, &e, name, options) != TagSuccess)
-			{
+			if ((err = tagsGetErrno (t)))
+				fprintf (stderr, "error: %d\n", err);
+			else
 				fprintf (stderr, "not found\n");
-				return 1;
-			}
-		}
-		else
-		{
-			if (tagsFindNext (t, &e) != TagSuccess)
-			{
-				fprintf (stderr, "not found\n");
-				return 1;
-			}
+			return 1;
 		}
 		fprintf (stderr, "found\n");
 
@@ -127,6 +123,11 @@ check_finding0 (tagFile *t, const char *name, const int options,
 	if (tagsFindNext (t, &e) == TagSuccess)
 	{
 		fprintf (stderr, "still existing\n");
+		return 1;
+	}
+	else if ((err = tagsGetErrno (t)))
+	{
+		fprintf (stderr, "unexpected error: %d\n", err);
 		return 1;
 	}
 	fprintf (stderr, "ok\n");

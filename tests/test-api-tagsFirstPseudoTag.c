@@ -27,6 +27,7 @@ check_iterating0 (tagFile *t, struct expectation *expectations, int count)
 {
 	tagEntry e;
 	struct expectation *x;
+	int err;
 
 	for (int i = 0; i < count; i++)
 	{
@@ -35,7 +36,10 @@ check_iterating0 (tagFile *t, struct expectation *expectations, int count)
 		{
 			if (tagsFirstPseudoTag (t, &e) != TagSuccess)
 			{
-				fprintf (stderr, "no more ptag\n");
+				if ((err = tagsGetErrno (t)))
+					fprintf (stderr, "error: %d\n", err);
+				else
+					fprintf (stderr, "no more ptag\n");
 				return 1;
 			}
 		}
@@ -43,7 +47,10 @@ check_iterating0 (tagFile *t, struct expectation *expectations, int count)
 		{
 			if (tagsNextPseudoTag (t, &e) != TagSuccess)
 			{
-				fprintf (stderr, "no more ptag\n");
+				if ((err = tagsGetErrno (t)))
+					fprintf (stderr, "error: %d\n", err);
+				else
+					fprintf (stderr, "no more ptag\n");
 				return 1;
 			}
 		}
@@ -80,7 +87,10 @@ check_iterating0 (tagFile *t, struct expectation *expectations, int count)
 	fprintf (stderr, "verifying no remain....");
 	if (tagsNextPseudoTag (t, &e) == TagSuccess)
 	{
-		fprintf (stderr, "still existing\n");
+		if ((err = tagsGetErrno (t)))
+			fprintf (stderr, "error: %d\n", err);
+		else
+			fprintf (stderr, "still existing\n");
 		return 1;
 	}
 	fprintf (stderr, "ok\n");
