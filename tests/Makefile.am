@@ -5,6 +5,7 @@ TESTS = \
 	test-api-tagsFirstPseudoTag \
 	test-api-tagsFirst \
 	test-api-tagsClose \
+	test-api-tagsSetSortType \
 	\
 	test-fix-unescaping \
 	test-fix-null-deref \
@@ -18,6 +19,7 @@ check_PROGRAMS = \
 	test-api-tagsFirstPseudoTag \
 	test-api-tagsFirst \
 	test-api-tagsClose \
+	test-api-tagsSetSortType \
 	\
 	test-fix-unescaping \
 	test-fix-null-deref \
@@ -67,6 +69,9 @@ EXTRA_DIST += broken-line-field-other-than-first.tags
 
 test_api_tagsClose = test-api-tagsClose.c
 test_api_tagsClose_DEPENDENCIES = $(DEPS)
+
+test_api_tagsSetSortType = test-api-tagsSetSortType.c
+test_api_tagsSetSortType_DEPENDENCIES = $(DEPS)
 
 test_fix_unescaping = test-fix-unescaping.c
 test_fix_unescaping_DEPENDENCIES = $(DEPS)
