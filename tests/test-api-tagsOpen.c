@@ -196,6 +196,13 @@ main (void)
 		fprintf (stderr, "unexpected error (!= TagErrnoUnexpectedFormat)\n");
 	}
 	fprintf (stderr, "ok\n");
+	fprintf (stderr, "closing the unopened tag file...");
+	if (tagsClose (t) == TagSuccess)
+	{
+		fprintf (stderr, "unexpected result\n");
+		return 1;
+	}
+	fprintf (stderr, "ok\n");
 
 	fprintf (stderr, "opening an broken tags file (format: not a number)...");
 	t = tagsOpen ("./api-tagsOpen-wrong-format-nonum.tags", &info);
@@ -207,6 +214,13 @@ main (void)
 	else if (info.status.error_number != TagErrnoUnexpectedFormat)
 	{
 		fprintf (stderr, "unexpected error (!= TagErrnoUnexpectedFormat)\n");
+	}
+	fprintf (stderr, "ok\n");
+	fprintf (stderr, "closing the unopened tag file...");
+	if (tagsClose (t) == TagSuccess)
+	{
+		fprintf (stderr, "unexpected result\n");
+		return 1;
 	}
 	fprintf (stderr, "ok\n");
 
@@ -222,6 +236,13 @@ main (void)
 		fprintf (stderr, "unexpected error (!= TagErrnoUnexpectedSortedMethod)\n");
 	}
 	fprintf (stderr, "ok\n");
+	fprintf (stderr, "closing the unopened tag file...");
+	if (tagsClose (t) == TagSuccess)
+	{
+		fprintf (stderr, "unexpected result\n");
+		return 1;
+	}
+	fprintf (stderr, "ok\n");
 
 	fprintf (stderr, "opening an broken tags file (sort: not a number)...");
 	t = tagsOpen ("./api-tagsOpen-wrong-sort-method-nonum.tags", &info);
@@ -235,7 +256,13 @@ main (void)
 		fprintf (stderr, "unexpected error (!= TagErrnoUnexpectedSortedMethod)\n");
 	}
 	fprintf (stderr, "ok\n");
-
+	fprintf (stderr, "closing the unopened tag file...");
+	if (tagsClose (t) == TagSuccess)
+	{
+		fprintf (stderr, "unexpected result\n");
+		return 1;
+	}
+	fprintf (stderr, "ok\n");
 
 	const char* broken_PROGRAM_AUTHOR [6] = {
 		"Universal Ctags Team",
@@ -270,6 +297,13 @@ main (void)
 					 broken_PROGRAM_AUTHOR [i]? broken_PROGRAM_AUTHOR [i]: "(null)");
 			return 1;
 		}
+		fprintf (stderr, "closing the unopened tag file...");
+		if (tagsClose (t) == TagFailure)
+		{
+			fprintf (stderr, "successful unexpectedly\n");
+			return 1;
+		}
+		fprintf (stderr, "ok\n");
 	}
 
 	return 0;
