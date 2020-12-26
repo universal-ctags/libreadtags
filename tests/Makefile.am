@@ -4,6 +4,7 @@ TESTS = \
 	test-api-tagsFind \
 	test-api-tagsFirstPseudoTag \
 	test-api-tagsFirst \
+	test-api-tagsClose \
 	\
 	test-fix-unescaping \
 	test-fix-null-deref \
@@ -16,6 +17,7 @@ check_PROGRAMS = \
 	test-api-tagsFind \
 	test-api-tagsFirstPseudoTag \
 	test-api-tagsFirst \
+	test-api-tagsClose \
 	\
 	test-fix-unescaping \
 	test-fix-null-deref \
@@ -62,6 +64,9 @@ EXTRA_DIST += empty.tags
 EXTRA_DIST += empty-no-newline.tags
 EXTRA_DIST += broken-line-field.tags
 EXTRA_DIST += broken-line-field-other-than-first.tags
+
+test_api_tagsClose = test-api-tagsClose.c
+test_api_tagsClose_DEPENDENCIES = $(DEPS)
 
 test_fix_unescaping = test-fix-unescaping.c
 test_fix_unescaping_DEPENDENCIES = $(DEPS)
