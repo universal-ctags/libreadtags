@@ -1,5 +1,5 @@
 /*
- * for s in yes foldcase no; do 
+ * for s in yes foldcase no; do
  *   u-ctags --quiet --options=NONE -o duplicated-names--sorted-$s.tags --kinds-C='*' --sort=$s duplicated-names.c
  * done
  */
