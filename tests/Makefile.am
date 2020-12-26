@@ -49,6 +49,7 @@ EXTRA_DIST += duplicated-names.c
 EXTRA_DIST += duplicated-names--sorted-yes.tags
 EXTRA_DIST += duplicated-names--sorted-no.tags
 EXTRA_DIST += duplicated-names--sorted-foldcase.tags
+EXTRA_DIST += broken-line-field-in-middle.tags
 
 test_api_tagsFirstPseudoTag = test-api-tagsFirstPseudoTag.c
 test_api_tagsFirstPseudoTag_DEPENDENCIES = $(DEPS)
