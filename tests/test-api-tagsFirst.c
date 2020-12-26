@@ -16,6 +16,7 @@
 struct entryExpectaion {
 	tagResult result;
 	const char *name;
+	int err;
 };
 
 #define LAST {											\
@@ -52,7 +53,19 @@ check_one (tagFile *t, struct entryExpectaion *ex, tagEntry *e, int first)
 			}
 		}
 		else
+		{
 			fprintf (stderr, "nothing found expectedly\n");
+
+			fprintf (stderr, "comparing errno...");
+			int err = tagsGetErrno (t);
+			if (err == ex->err)
+				fprintf (stderr, "matched: %d\n", err);
+			else
+			{
+				fprintf (stderr, "unmatched: %d (expected: %d)\n", err, ex->err);
+				return 1;
+			}
+		}
 	}
 	else if (ex->result == TagSuccess)
 	{
@@ -144,9 +157,10 @@ main (void)
 			.file = "empty.tags",
 			.first = {
 				.result = TagFailure,
+				.err    = 0,
 			},
 			.next = ((struct entryExpectaion []) {
-					{TagFailure, NULL},
+					{TagFailure, NULL, 0},
 					LAST,
 				}),
 		},
@@ -154,9 +168,41 @@ main (void)
 			.file = "empty-no-newline.tags",
 			.first = {
 				.result = TagFailure,
+				.err    = 0,
 			},
 			.next = ((struct entryExpectaion []) {
-					{TagFailure, NULL},
+					{TagFailure, NULL, 0},
+					LAST,
+				}),
+		},
+		{
+			.file = "broken-line-field.tags",
+			.first = {
+				.result = TagFailure,
+				.name   = NULL,
+				.err = TagErrnoUnexpectedLineno,
+			},
+			.next = ((struct entryExpectaion []) {
+					LAST,
+				}),
+		},
+		{
+			.file = "broken-line-field-other-than-first.tags",
+			.first = {
+				.result = TagSuccess,
+				.name   = "M",
+			},
+			.next = ((struct entryExpectaion []) {
+					{
+						.result = TagSuccess,
+						.name   = "N",
+					},
+					{
+						.result = TagFailure,
+						.name   = NULL,
+						.err    = TagErrnoUnexpectedLineno,
+
+					},
 					LAST,
 				}),
 		},

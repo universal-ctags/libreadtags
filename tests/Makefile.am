@@ -59,6 +59,8 @@ test_api_tagsFirst = test-api-tagsFirst.c
 test_api_tagsFirst_DEPENDENCIES = $(DEPS)
 EXTRA_DIST += empty.tags
 EXTRA_DIST += empty-no-newline.tags
+EXTRA_DIST += broken-line-field.tags
+EXTRA_DIST += broken-line-field-other-than-first.tags
 
 test_fix_unescaping = test-fix-unescaping.c
 test_fix_unescaping_DEPENDENCIES = $(DEPS)
