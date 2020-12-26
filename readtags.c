@@ -549,7 +549,7 @@ static tagResult parseTagLine (tagFile *file, tagEntry *const entry, int *err)
 
 				if (p == NULL)
 				{
-					/* invalid pattern */
+					/* TODO: invalid pattern */
 				}
 				else
 					++p;
@@ -579,7 +579,7 @@ static tagResult parseTagLine (tagFile *file, tagEntry *const entry, int *err)
 
 						if (p == NULL)
 						{
-							/* invalid pattern */
+							/* TODO: invalid pattern */
 						}
 						else
 							++p;
@@ -588,7 +588,7 @@ static tagResult parseTagLine (tagFile *file, tagEntry *const entry, int *err)
 			}
 			else
 			{
-				/* invalid pattern */
+				/* TODO: invalid pattern */
 			}
 
 			if (p)
