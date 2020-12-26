@@ -245,6 +245,52 @@ main (void)
 	if (check_iterating (tags_sorted_no, exp_sorted_no, COUNT(exp_sorted_no)) != 0)
 		return 1;
 
+	/* No entry */
+	const char *tags = "./ptag-sort-yes.tags";
+	tagFileInfo info;
+
+	fprintf (stderr, "opening %s...", tags);
+	tagFile *t = tagsOpen (tags, &info);
+	if (!t)
+	{
+		fprintf (stderr, "unexpected result (t: %p, opened: %d, error_number: %d)\n",
+				 t, info.status.opened, info.status.error_number);
+		return 1;
+	}
+	fprintf (stderr, "ok\n");
+
+
+	fprintf (stderr, "visiting the first tag with NULL tagEntry...");
+	if (tagsFirstPseudoTag (t, NULL) != TagSuccess)
+	{
+		int err;
+		if ((err = tagsGetErrno (t)))
+			fprintf (stderr, "error: %d\n", err);
+		else
+			fprintf (stderr, "no first ptag\n");
+		return 1;
+	}
+	fprintf (stderr, "ok\n");
+
+	fprintf (stderr, "visiting the next tag with NULL tagEntry...");
+	if (tagsNextPseudoTag (t, NULL) != TagSuccess)
+	{
+		int err;
+		if ((err = tagsGetErrno (t)))
+			fprintf (stderr, "error: %d\n", err);
+		else
+			fprintf (stderr, "no more ptag\n");
+		return 1;
+	}
+	fprintf (stderr, "ok\n");
+
+	fprintf (stderr, "closing the tag file...");
+	if (tagsClose (t) != TagSuccess)
+	{
+		fprintf (stderr, "unexpected result\n");
+		return 1;
+	}
+	fprintf (stderr, "ok\n");
 
 	return 0;
 }
