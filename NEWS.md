@@ -1,3 +1,8 @@
+# Version ???
+
+- delete debug output automatically printed when DEBUG is defiend in
+  build-time.
+
 # Version 0.1.0
 
 - propagate internal errors to caller
