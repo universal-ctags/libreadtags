@@ -157,7 +157,8 @@ main (void)
 	}
 	fprintf (stderr, "ok\n");
 
-	fprintf (stderr, "opening a / (EISDIR is expected)...");
+	fprintf (stderr, "opening a / (an error is expected)...");
+	info.status.error_number = 0;
 	t = tagsOpen ("/", &info);
 	if (t != NULL)
 	{
@@ -169,12 +170,12 @@ main (void)
 		fprintf (stderr, "unexpected result (opened != 0)\n");
 		return 1;
 	}
-	else if (info.status.error_number != EISDIR)
+	else if (info.status.error_number == 0)
 	{
-		fprintf (stderr, "unexpected result (%d != EISDIR)\n", info.status.error_number);
+		fprintf (stderr, "no error\n");
 		return 1;
 	}
-	fprintf (stderr, "ok\n");
+	fprintf (stderr, "ok (errno: %d)\n", info.status.error_number);
 
 	fprintf (stderr, "closing the unopened tag file...");
 	if (tagsClose (t) == TagSuccess)
