@@ -1095,18 +1095,12 @@ static tagResult find (tagFile *const file, tagEntry *const entry,
 	if ((file->sortMethod == TAG_SORTED      && !file->search.ignorecase) ||
 		(file->sortMethod == TAG_FOLDSORTED  &&  file->search.ignorecase))
 	{
-#ifdef DEBUG
-		fputs ("<performing binary search>\n", stderr);
-#endif
 		result = findBinary (file);
 		if (result == TagFailure && file->err)
 			return TagFailure;
 	}
 	else
 	{
-#ifdef DEBUG
-		fputs ("<performing sequential search>\n", stderr);
-#endif
 		result = findSequential (file);
 		if (result == TagFailure && file->err)
 			return TagFailure;
