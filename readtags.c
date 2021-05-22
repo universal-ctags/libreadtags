@@ -16,6 +16,14 @@
 #include <errno.h>
 #include <sys/types.h>  /* to declare off_t */
 
+#ifdef HAVE_MMAP
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+#include <unistd.h>
+#include <sys/mman.h>
+#endif
+
 #include "readtags.h"
 
 /*
@@ -32,6 +40,33 @@ typedef struct {
 	char *buffer;
 } vstring;
 
+#ifdef HAVE_MMAP
+typedef off_t rdtags_fpos_t;
+struct mmap {
+	unsigned char *data;
+	long offset;
+	size_t length;
+} *source;
+static struct mmap *rdtags_fopen(const char *pathname, const char *mode);
+static int rdtags_fclose(struct mmap *stream);
+static long rdtags_ftell(struct mmap *stream);
+static char *rdtags_fgets(char *s, int size, struct mmap *stream);
+static int rdtags_feof(struct mmap *stream);
+static int rdtags_fseek(struct mmap *stream, long offset, int whence);
+static int rdtags_fgetpos(struct mmap *stream, rdtags_fpos_t *pos);
+static int rdtags_fsetpos(struct mmap *stream, const rdtags_fpos_t *pos);
+#else
+#define rdtags_fpos_t  fpos_t
+#define rdtags_fopen   fopen
+#define rdtags_fclose  fclose
+#define rdtags_ftell   ftell
+#define rdtags_fgets   fgets
+#define rdtags_feof    feof
+#define rdtags_fseek   fseek
+#define rdtags_fgetpos fgetpos
+#define rdtags_fsetpos fsetpos
+#endif
+
 /* Information about current tag file */
 struct sTagFile {
 		/* has the file been opened and this structure initialized? */
@@ -41,7 +76,11 @@ struct sTagFile {
 		/* how is the tag file sorted? */
 	tagSortType sortMethod;
 		/* pointer to file structure */
-	FILE* fp;
+#ifdef HAVE_MMAP
+	struct mmap *source;
+#else
+	FILE *source;
+#endif
 		/* file position of first character of `line' */
 	off_t pos;
 		/* size of tag file in seekable positions */
@@ -285,7 +324,7 @@ static int readTagLineRaw (tagFile *const file, int *err)
 		char *const pLastChar = file->line.buffer + file->line.size - 2;
 		char *line;
 
-		file->pos = ftell (file->fp);
+		file->pos = rdtags_ftell (file->source);
 		if (file->pos < 0)
 		{
 			*err = errno;
@@ -294,12 +333,12 @@ static int readTagLineRaw (tagFile *const file, int *err)
 		}
 		reReadLine = 0;
 		*pLastChar = '\0';
-		line = fgets (file->line.buffer, (int) file->line.size, file->fp);
+		line = rdtags_fgets (file->line.buffer, (int) file->line.size, file->source);
 		if (line == NULL)
 		{
 			/* read error */
 			*err = 0;
-			if (! feof (file->fp))
+			if (! rdtags_feof (file->source))
 				*err = errno;
 			result = 0;
 		}
@@ -312,7 +351,7 @@ static int readTagLineRaw (tagFile *const file, int *err)
 				*err = ENOMEM;
 				result = 0;
 			}
-			if (fseek (file->fp, file->pos, SEEK_SET) < 0)
+			if (rdtags_fseek (file->source, file->pos, SEEK_SET) < 0)
 			{
 				*err = errno;
 				result = 0;
@@ -632,7 +671,7 @@ static int isPseudoTagLine (const char *buffer)
 
 static tagResult readPseudoTags (tagFile *const file, tagFileInfo *const info)
 {
-	fpos_t startOfLine;
+	rdtags_fpos_t startOfLine;
 	int err = 0;
 	tagResult result = TagSuccess;
 	const size_t prefixLength = strlen (PseudoTagPrefix);
@@ -646,7 +685,7 @@ static tagResult readPseudoTags (tagFile *const file, tagFileInfo *const info)
 
 	while (1)
 	{
-		if (fgetpos (file->fp, &startOfLine) < 0)
+		if (rdtags_fgetpos (file->source, &startOfLine) < 0)
 		{
 			err = errno;
 			break;
@@ -730,7 +769,7 @@ static tagResult readPseudoTags (tagFile *const file, tagFileInfo *const info)
 			info->program.version = file->program.version;
 		}
 	}
-	if (fsetpos (file->fp, &startOfLine) < 0)
+	if (rdtags_fsetpos (file->source, &startOfLine) < 0)
 		err = errno;
 
 	info->status.error_number = err;
@@ -746,9 +785,9 @@ static int doesFilePointPseudoTag (tagFile *const file, void *unused)
 
 static tagResult gotoFirstLogicalTag (tagFile *const file)
 {
-	fpos_t startOfLine;
+	rdtags_fpos_t startOfLine;
 
-	if (fseek(file->fp, 0L, SEEK_SET) == -1)
+	if (rdtags_fseek(file->source, 0L, SEEK_SET) == -1)
 	{
 		file->err = errno;
 		return TagFailure;
@@ -756,7 +795,7 @@ static tagResult gotoFirstLogicalTag (tagFile *const file)
 
 	while (1)
 	{
-		if (fgetpos (file->fp, &startOfLine) < 0)
+		if (rdtags_fgetpos (file->source, &startOfLine) < 0)
 		{
 			file->err = errno;
 			return TagFailure;
@@ -770,7 +809,7 @@ static tagResult gotoFirstLogicalTag (tagFile *const file)
 		if (!isPseudoTagLine (file->line.buffer))
 			break;
 	}
-	if (fsetpos (file->fp, &startOfLine) < 0)
+	if (rdtags_fsetpos (file->source, &startOfLine) < 0)
 	{
 		file->err = errno;
 		return TagFailure;
@@ -798,26 +837,26 @@ static tagFile *initialize (const char *const filePath, tagFileInfo *const info)
 		result->fields.max, sizeof (tagExtensionField));
 	if (result->fields.list == NULL)
 		goto mem_error;
-	result->fp = fopen (filePath, "rb");
-	if (result->fp == NULL)
+	result->source = rdtags_fopen (filePath, "rb");
+	if (result->source == NULL)
 	{
 		info->status.error_number = errno;
 		goto file_error;
 	}
 	else
 	{
-		if (fseek (result->fp, 0, SEEK_END) == -1)
+		if (rdtags_fseek (result->source, 0, SEEK_END) == -1)
 		{
 			info->status.error_number = errno;
 			goto file_error;
 		}
-		result->size = ftell (result->fp);
+		result->size = rdtags_ftell (result->source);
 		if (result->size == -1)
 		{
 			info->status.error_number = errno;
 			goto file_error;
 		}
-		if (fseek(result->fp, 0L, SEEK_SET) == -1)
+		if (rdtags_fseek(result->source, 0L, SEEK_SET) == -1)
 		{
 			info->status.error_number = errno;
 			goto file_error;
@@ -836,8 +875,8 @@ static tagFile *initialize (const char *const filePath, tagFileInfo *const info)
 	free (result->line.buffer);
 	free (result->name.buffer);
 	free (result->fields.list);
-	if (result->fp)
-		fclose (result->fp);
+	if (result->source)
+		rdtags_fclose (result->source);
 	free (result);
 	info->status.opened = 0;
 	return NULL;
@@ -845,7 +884,7 @@ static tagFile *initialize (const char *const filePath, tagFileInfo *const info)
 
 static void terminate (tagFile *const file)
 {
-	fclose (file->fp);
+	rdtags_fclose (file->source);
 
 	free (file->line.buffer);
 	free (file->name.buffer);
@@ -903,7 +942,7 @@ static const char *readFieldValue (
 
 static int readTagLineSeek (tagFile *const file, const off_t pos)
 {
-	if (fseek (file->fp, pos, SEEK_SET) < 0)
+	if (rdtags_fseek (file->source, pos, SEEK_SET) < 0)
 	{
 		file->err = errno;
 		return 0;
@@ -1076,18 +1115,18 @@ static tagResult find (tagFile *const file, tagEntry *const entry,
 	file->search.nameLength = strlen (name);
 	file->search.partial = (options & TAG_PARTIALMATCH) != 0;
 	file->search.ignorecase = (options & TAG_IGNORECASE) != 0;
-	if (fseek (file->fp, 0, SEEK_END) < 0)
+	if (rdtags_fseek (file->source, 0, SEEK_END) < 0)
 	{
 		file->err = errno;
 		return TagFailure;
 	}
-	file->size = ftell (file->fp);
+	file->size = rdtags_ftell (file->source);
 	if (file->size == -1)
 	{
 		file->err = errno;
 		return TagFailure;
 	}
-	if (fseek(file->fp, 0L, SEEK_SET) == -1)
+	if (rdtags_fseek(file->source, 0L, SEEK_SET) == -1)
 	{
 		file->err = errno;
 		return TagFailure;
@@ -1157,7 +1196,7 @@ static tagResult findPseudoTag (tagFile *const file, int rewindBeforeFinding, ta
 
 	if (rewindBeforeFinding)
 	{
-		if (fseek(file->fp, 0L, SEEK_SET) == -1)
+		if (rdtags_fseek(file->source, 0L, SEEK_SET) == -1)
 		{
 			file->err = errno;
 			return TagFailure;
@@ -1281,3 +1320,139 @@ extern int tagsGetErrno (tagFile *const file)
 		return TagErrnoInvalidArgument;
 	return file->err;
 }
+
+#ifdef HAVE_MMAP
+static struct mmap *rdtags_fopen(const char *pathname, const char *mode)
+{
+	struct mmap *m = malloc(sizeof (struct mmap));
+	if (!m)
+		return NULL;
+
+	int fd = open (pathname, O_RDONLY);
+	if (fd < 0)
+	{
+		free (m);
+		return NULL;
+	}
+
+	struct stat sb;
+	if (fstat (fd, &sb) < 0)
+	{
+		int tmp = errno;
+		free (m);
+		close (fd);
+		errno = tmp;
+		return NULL;
+	}
+	else if ((sb.st_mode & S_IFMT) == S_IFDIR)
+	{
+		free (m);
+		close (fd);
+		errno = EISDIR;
+		return NULL;
+	}
+
+	m->length = sb.st_size;
+	m->data = mmap (NULL, m->length, PROT_READ, MAP_PRIVATE, fd, 0);
+	if (m->data == MAP_FAILED)
+	{
+		int tmp = errno;
+		free (m);
+		close (fd);
+		errno = tmp;
+		return NULL;
+	}
+
+	m->offset = 0;
+	return m;
+}
+
+static int rdtags_fclose(struct mmap *stream)
+{
+	void *data = stream->data;
+	size_t len = stream->length;
+	free (stream);
+	return munmap (data, len);
+}
+
+static long rdtags_ftell(struct mmap *stream)
+{
+	return stream->offset;
+}
+
+static char *rdtags_fgets(char *s, int size, struct mmap *stream)
+{
+	if (rdtags_feof (stream))
+		return NULL;
+	if (size == 0)
+		return s;
+
+	size_t rest = stream->length - stream->offset;
+	size_t length = rest;
+	if (length > size - 1)
+		length = size - 1;
+
+	char *current = stream->data + stream->offset;
+	char *end  = memchr (current, '\n', length);
+
+	if (end)
+	{
+		size_t delta = end - current;
+		memcpy (s, current, delta);
+		if (delta > 1 && s [delta - 2] == '\r')
+		{
+			s [delta - 2] = '\n';
+			s [delta - 1] = '\0';
+		}
+		else
+			s [delta]     = '\0';
+		rdtags_fseek(stream, delta + 1, SEEK_CUR);
+	}
+	else
+	{
+		memcpy (s, current, length);
+		if (rest > length
+			&& s [length - 1] == '\r' && current [length] == '\n')
+			s [length - 1] = '\n';
+
+		s [length] = '\0';
+		rdtags_fseek(stream, length + 1, SEEK_CUR);
+	}
+
+	return s;
+}
+
+static int rdtags_feof(struct mmap *stream)
+{
+	return stream->offset >= stream->length;
+}
+
+static int rdtags_fseek(struct mmap *stream, long offset, int whence)
+{
+	if (whence == SEEK_END)
+		offset = stream->length - offset;
+	else if (whence == SEEK_CUR)
+		offset = stream->offset + offset;
+
+
+	if (offset > stream->length)
+		offset = stream->length;
+	else if (offset < 0)
+		offset = 0;
+
+	stream->offset = offset;
+
+	return 0;
+}
+
+static int rdtags_fgetpos(struct mmap *stream, rdtags_fpos_t *pos)
+{
+	*pos = stream->offset;
+	return 0;
+}
+
+static int rdtags_fsetpos(struct mmap *stream, const rdtags_fpos_t *pos)
+{
+	return rdtags_fseek(stream,  (long) *pos, SEEK_SET);
+}
+#endif

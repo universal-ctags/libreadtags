@@ -37,6 +37,8 @@ AC_SUBST([GCOV_CFLAGS])
 
 AC_PROG_CC_C99
 
+AC_CHECK_FUNCS([mmap])
+
 AC_CONFIG_FILES([Makefile
 		libreadtags.pc
 		tests/Makefile])

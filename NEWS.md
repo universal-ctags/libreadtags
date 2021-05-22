@@ -3,6 +3,8 @@
 - delete debug output automatically printed when DEBUG is defiend in
   build-time.
 
+- use mmap for reading tags file if it is available.
+
 # Version 0.1.0
 
 - propagate internal errors to caller
