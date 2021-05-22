@@ -171,7 +171,7 @@ main (void)
 	}
 	else if (info.status.error_number != EISDIR)
 	{
-		fprintf (stderr, "unexpected result (error_number != EISDIR)\n");
+		fprintf (stderr, "unexpected result (%d != EISDIR)\n", info.status.error_number);
 		return 1;
 	}
 	fprintf (stderr, "ok\n");
