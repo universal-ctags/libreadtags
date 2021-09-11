@@ -276,9 +276,9 @@ main (void)
 	for (int i = 0; i < 6; i++)
 	{
 		char tagf_name_tmpl [] = "./api-tagsOpen-incomplete-program-author-%d.tags";
-		char tagf_name [sizeof (tagf_name_tmpl)];
+		char tagf_name [sizeof (tagf_name_tmpl) - 1];
 		fprintf (stderr, "opening a tags file with incomplete PROGRAM_AUTHOR field [trimming level: %d]...", i);
-		sprintf (tagf_name, tagf_name_tmpl, i);
+		snprintf (tagf_name, sizeof (tagf_name), tagf_name_tmpl, i);
 		t = tagsOpen (tagf_name, &info);
 		if (t == NULL)
 		{
