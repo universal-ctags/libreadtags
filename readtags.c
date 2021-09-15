@@ -870,19 +870,23 @@ static void terminate (tagFile *const file)
 static tagResult readNext (tagFile *const file, tagEntry *const entry)
 {
 	tagResult result;
-	if (file == NULL  ||  ! file->initialized)
+
+	if (file == NULL)
+		return TagFailure;
+
+	if (! file->initialized)
 	{
 		file->err = TagErrnoInvalidArgument;
-		result = TagFailure;
+		return TagFailure;
 	}
-	else if (! readTagLine (file, &file->err))
-		result = TagFailure;
-	else
-	{
-		result = (entry != NULL)
-			? parseTagLine (file, entry, &file->err)
-			: TagSuccess;
-	}
+
+	if (! readTagLine (file, &file->err))
+		return TagFailure;
+
+	result = (entry != NULL)
+		? parseTagLine (file, entry, &file->err)
+		: TagSuccess;
+
 	return result;
 }
 
@@ -1034,7 +1038,10 @@ static tagResult findSequentialFull (tagFile *const file,
 									 int (* isAcceptable) (tagFile *const, void *),
 									 void *data)
 {
-	if (file == NULL || !file->initialized || file->err)
+	if (file == NULL)
+		return TagFailure;
+
+	if (!file->initialized || file->err)
 	{
 		file->err = TagErrnoInvalidArgument;
 		return TagFailure;
@@ -1149,9 +1156,12 @@ static tagResult findNext (tagFile *const file, tagEntry *const entry)
 
 static tagResult findPseudoTag (tagFile *const file, int rewindBeforeFinding, tagEntry *const entry)
 {
-	if (file == NULL || (!file->initialized) || file->err)
+	if (file == NULL)
+		return TagFailure;
+
+	if (!file->initialized || file->err)
 	{
-		file->err= TagErrnoInvalidArgument;;
+		file->err = TagErrnoInvalidArgument;
 		return TagFailure;
 	}
 
@@ -1182,7 +1192,10 @@ extern tagFile *tagsOpen (const char *const filePath, tagFileInfo *const info)
 
 extern tagResult tagsSetSortType (tagFile *const file, const tagSortType type)
 {
-	if (file == NULL || (!file->initialized) || file->err)
+	if (file == NULL)
+		return TagFailure;
+
+	if (!file->initialized || file->err)
 	{
 		file->err = TagErrnoInvalidArgument;
 		return TagFailure;
@@ -1203,7 +1216,10 @@ extern tagResult tagsSetSortType (tagFile *const file, const tagSortType type)
 
 extern tagResult tagsFirst (tagFile *const file, tagEntry *const entry)
 {
-	if (file == NULL || (!file->initialized) || file->err)
+	if (file == NULL)
+		return TagFailure;
+
+	if (!file->initialized || file->err)
 	{
 		file->err = TagErrnoInvalidArgument;
 		return TagFailure;
@@ -1216,7 +1232,10 @@ extern tagResult tagsFirst (tagFile *const file, tagEntry *const entry)
 
 extern tagResult tagsNext (tagFile *const file, tagEntry *const entry)
 {
-	if (file == NULL || (!file->initialized) || file->err)
+	if (file == NULL)
+		return TagFailure;
+
+	if (!file->initialized || file->err)
 	{
 		file->err = TagErrnoInvalidArgument;
 		return TagFailure;
@@ -1236,21 +1255,29 @@ extern const char *tagsField (const tagEntry *const entry, const char *const key
 extern tagResult tagsFind (tagFile *const file, tagEntry *const entry,
 						   const char *const name, const int options)
 {
-	if (file == NULL || !file->initialized || file->err)
+	if (file == NULL)
+		return TagFailure;
+
+	if (!file->initialized || file->err)
 	{
 		file->err = TagErrnoInvalidArgument;
 		return TagFailure;
 	}
+
 	return find (file, entry, name, options);
 }
 
 extern tagResult tagsFindNext (tagFile *const file, tagEntry *const entry)
 {
-	if (file == NULL || !file->initialized || file->err)
+	if (file == NULL)
+		return TagFailure;
+
+	if (!file->initialized || file->err)
 	{
 		file->err = TagErrnoInvalidArgument;
 		return TagFailure;
 	}
+
 	return findNext (file, entry);
 }
 
