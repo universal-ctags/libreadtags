@@ -9,6 +9,9 @@
 /*
 *   INCLUDE FILES
 */
+#ifdef _WIN32
+#include <config.h>  /* to define _FILE_OFFSET_BITS for Windows */
+#endif
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
@@ -96,6 +99,32 @@ static const size_t PseudoTagPrefixLength = 2;
 /*
 *   FUNCTION DEFINITIONS
 */
+
+static off_t readtags_ftell(FILE *fp)
+{
+	off_t pos;
+
+#ifdef _WIN32
+	pos = _ftelli64(fp);
+#else
+	pos = ftell(fp);
+#endif
+
+	return pos;
+}
+
+static int readtags_fseek(FILE *fp, off_t pos, int whence)
+{
+	int ret;
+
+#ifdef _WIN32
+	ret = _fseeki64(fp, pos, whence);
+#else
+	ret = fseek(fp, pos, whence);
+#endif
+
+	return ret;
+}
 
 /* Converts a hexadecimal digit to its value */
 static int xdigitValue (char digit)
@@ -285,7 +314,7 @@ static int readTagLineRaw (tagFile *const file, int *err)
 		char *const pLastChar = file->line.buffer + file->line.size - 2;
 		char *line;
 
-		file->pos = ftell (file->fp);
+		file->pos = readtags_ftell (file->fp);
 		if (file->pos < 0)
 		{
 			*err = errno;
@@ -312,7 +341,8 @@ static int readTagLineRaw (tagFile *const file, int *err)
 				*err = ENOMEM;
 				result = 0;
 			}
-			if (fseek (file->fp, file->pos, SEEK_SET) < 0)
+
+			if (readtags_fseek (file->fp, file->pos, SEEK_SET) < 0)
 			{
 				*err = errno;
 				result = 0;
@@ -748,7 +778,7 @@ static tagResult gotoFirstLogicalTag (tagFile *const file)
 {
 	fpos_t startOfLine;
 
-	if (fseek(file->fp, 0L, SEEK_SET) == -1)
+	if (readtags_fseek(file->fp, 0L, SEEK_SET) == -1)
 	{
 		file->err = errno;
 		return TagFailure;
@@ -806,18 +836,18 @@ static tagFile *initialize (const char *const filePath, tagFileInfo *const info)
 	}
 	else
 	{
-		if (fseek (result->fp, 0, SEEK_END) == -1)
+		if (readtags_fseek (result->fp, 0, SEEK_END) == -1)
 		{
 			info->status.error_number = errno;
 			goto file_error;
 		}
-		result->size = ftell (result->fp);
+		result->size = readtags_ftell (result->fp);
 		if (result->size == -1)
 		{
 			info->status.error_number = errno;
 			goto file_error;
 		}
-		if (fseek(result->fp, 0L, SEEK_SET) == -1)
+		if (readtags_fseek(result->fp, 0L, SEEK_SET) == -1)
 		{
 			info->status.error_number = errno;
 			goto file_error;
@@ -907,7 +937,7 @@ static const char *readFieldValue (
 
 static int readTagLineSeek (tagFile *const file, const off_t pos)
 {
-	if (fseek (file->fp, pos, SEEK_SET) < 0)
+	if (readtags_fseek (file->fp, pos, SEEK_SET) < 0)
 	{
 		file->err = errno;
 		return 0;
@@ -1083,18 +1113,18 @@ static tagResult find (tagFile *const file, tagEntry *const entry,
 	file->search.nameLength = strlen (name);
 	file->search.partial = (options & TAG_PARTIALMATCH) != 0;
 	file->search.ignorecase = (options & TAG_IGNORECASE) != 0;
-	if (fseek (file->fp, 0, SEEK_END) < 0)
+	if (readtags_fseek (file->fp, 0, SEEK_END) < 0)
 	{
 		file->err = errno;
 		return TagFailure;
 	}
-	file->size = ftell (file->fp);
+	file->size = readtags_ftell (file->fp);
 	if (file->size == -1)
 	{
 		file->err = errno;
 		return TagFailure;
 	}
-	if (fseek(file->fp, 0L, SEEK_SET) == -1)
+	if (readtags_fseek(file->fp, 0L, SEEK_SET) == -1)
 	{
 		file->err = errno;
 		return TagFailure;
@@ -1167,7 +1197,7 @@ static tagResult findPseudoTag (tagFile *const file, int rewindBeforeFinding, ta
 
 	if (rewindBeforeFinding)
 	{
-		if (fseek(file->fp, 0L, SEEK_SET) == -1)
+		if (readtags_fseek(file->fp, 0L, SEEK_SET) == -1)
 		{
 			file->err = errno;
 			return TagFailure;
