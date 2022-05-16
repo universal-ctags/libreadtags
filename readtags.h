@@ -59,6 +59,7 @@ typedef enum {
 										  * (Zero or a positive integer is expected.) */
 	TagErrnoInvalidArgument        = -4, /* Unexpected argument passed to the API
 										  * function */
+	TagErrnoFileMaybeTooBig        = -5, /* Maybe the tags file is too big */
 } tagErrno;
 
 struct sTagFile;
