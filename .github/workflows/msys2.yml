@@ -27,7 +27,7 @@ jobs:
         msystem: ${{ matrix.msystem }}
         update: true
         install: git make automake1.16 autoconf libtool
-    
+
     - if:  matrix.msystem == 'MSYS'
       run: pacman -S --noconfirm gcc
 
@@ -47,4 +47,4 @@ jobs:
     - run: ./autogen.sh
     - run: ./configure --prefix=/usr
     - run: make V=1
-    - run: make check V=1      
+    - run: make check V=1
