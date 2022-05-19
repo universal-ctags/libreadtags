@@ -9,8 +9,8 @@
 /*
 *   INCLUDE FILES
 */
-#ifdef _WIN32
-#include <config.h>  /* to define _FILE_OFFSET_BITS for Windows */
+#if defined(_WIN32) && !defined(_FILE_OFFSET_BITS)
+#define _FILE_OFFSET_BITS 64
 #endif
 #include <stdlib.h>
 #include <string.h>
