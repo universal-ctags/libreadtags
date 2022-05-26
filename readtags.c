@@ -782,7 +782,7 @@ static tagResult gotoFirstLogicalTag (tagFile *const file)
 {
 	fpos_t startOfLine;
 
-	if (readtags_fseek(file->fp, 0L, SEEK_SET) == -1)
+	if (readtags_fseek(file->fp, 0, SEEK_SET) == -1)
 	{
 		file->err = errno;
 		return TagFailure;
@@ -860,7 +860,7 @@ static tagFile *initialize (const char *const filePath, tagFileInfo *const info)
 
 		goto file_error;
 	}
-	if (readtags_fseek(result->fp, 0L, SEEK_SET) == -1)
+	if (readtags_fseek(result->fp, 0, SEEK_SET) == -1)
 	{
 		info->status.error_number = errno;
 		goto file_error;
@@ -1137,7 +1137,7 @@ static tagResult find (tagFile *const file, tagEntry *const entry,
 		file->err = errno;
 		return TagFailure;
 	}
-	if (readtags_fseek(file->fp, 0L, SEEK_SET) == -1)
+	if (readtags_fseek(file->fp, 0, SEEK_SET) == -1)
 	{
 		file->err = errno;
 		return TagFailure;
@@ -1210,7 +1210,7 @@ static tagResult findPseudoTag (tagFile *const file, int rewindBeforeFinding, ta
 
 	if (rewindBeforeFinding)
 	{
-		if (readtags_fseek(file->fp, 0L, SEEK_SET) == -1)
+		if (readtags_fseek(file->fp, 0, SEEK_SET) == -1)
 		{
 			file->err = errno;
 			return TagFailure;
