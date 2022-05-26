@@ -6,6 +6,12 @@
 - fix potential crashes trigged when passing NULL as `file` parameter
   to the API functions. Provided by rootkea (GitHub account).
 
+- add a new error constant `TagErrnoFileMaybeTooBig` to represent
+  the case that the given tags file is too large for the platform APIs
+  (ftell and fseek) used in libreadtags.
+  See https://github.com/universal-ctags/libreadtags/issues/36 about the
+  background of this change.
+
 # Version 0.1.0
 
 - propagate internal errors to caller

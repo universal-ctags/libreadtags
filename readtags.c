@@ -804,31 +804,40 @@ static tagFile *initialize (const char *const filePath, tagFileInfo *const info)
 		info->status.error_number = errno;
 		goto file_error;
 	}
-	else
+
+	/* Record the size of the tags file to `size` field of result. */
+	if (fseek (result->fp, 0, SEEK_END) == -1)
 	{
-		if (fseek (result->fp, 0, SEEK_END) == -1)
-		{
-			info->status.error_number = errno;
-			goto file_error;
-		}
-		result->size = ftell (result->fp);
-		if (result->size == -1)
-		{
-			info->status.error_number = errno;
-			goto file_error;
-		}
-		if (fseek(result->fp, 0L, SEEK_SET) == -1)
-		{
-			info->status.error_number = errno;
-			goto file_error;
-		}
-
-		if (readPseudoTags (result, info) == TagFailure)
-			goto file_error;
-
-		info->status.opened = 1;
-		result->initialized = 1;
+		info->status.error_number = errno;
+		goto file_error;
 	}
+	result->size = ftell (result->fp);
+	if (result->size == -1)
+	{
+		/* fseek() retruns an int value.
+		 * We observed following behavior on Windows;
+		 * if sizeof(int) of the platform is too small for
+		 * representing the size of the tags file, fseek()
+		 * returns -1 and it doesn't set errno.
+		 */
+		info->status.error_number = errno;
+		if (info->status.error_number == 0)
+			info->status.error_number = TagErrnoFileMaybeTooBig;
+
+		goto file_error;
+	}
+	if (fseek(result->fp, 0L, SEEK_SET) == -1)
+	{
+		info->status.error_number = errno;
+		goto file_error;
+	}
+
+	if (readPseudoTags (result, info) == TagFailure)
+		goto file_error;
+
+	info->status.opened = 1;
+	result->initialized = 1;
+
 	return result;
  mem_error:
 	info->status.error_number = ENOMEM;
