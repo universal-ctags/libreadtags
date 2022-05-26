@@ -12,6 +12,11 @@
   See https://github.com/universal-ctags/libreadtags/issues/36 about the
   background of this change.
 
+- allow the library to read larger (> 2G) tag files on Win32 platform.
+  The tag file size was limited to 2G on the platform because the library
+  used fseek and ftell. In this version, they are replaced with _fseeki64 and
+  _ftelli64.
+
 # Version 0.1.0
 
 - propagate internal errors to caller
