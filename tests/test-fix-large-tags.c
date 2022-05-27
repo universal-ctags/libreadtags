@@ -123,7 +123,10 @@ main (void)
 		 && (
 			 info.status.error_number == EFBIG
 			 || info.status.error_number == TagErrnoFileMaybeTooBig)))
-		fprintf(stderr, "failed with expected error\n");
+	{
+		r = 1;
+		fprintf(stderr, "failed with expected error: %d\n", info.status.error_number);
+	}
 	else if (t && info.status.opened)
 		fprintf(stderr, "done\n");
 	else
