@@ -1,5 +1,5 @@
 # -*- Autoconf -*-
-AC_INIT(libreadtags, 0.1.0)
+AC_INIT(libreadtags, 0.2.0)
 AC_CONFIG_MACRO_DIR([m4])
 AC_CONFIG_SRCDIR([readtags.c])
 
@@ -27,6 +27,7 @@ AC_PROG_LIBTOOL
 #
 # 2:0:1
 #    introduced TagErrnoFileMayTooBig.
+#    introduced tagsFindPseudoTag.
 #
 AC_SUBST(LT_VERSION, [2:0:1])
 
