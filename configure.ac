@@ -1,5 +1,5 @@
 # -*- Autoconf -*-
-AC_INIT(libreadtags, 0.2.0)
+AC_INIT(libreadtags, 0.2.1)
 AC_CONFIG_MACRO_DIR([m4])
 AC_CONFIG_SRCDIR([readtags.c])
 
@@ -29,7 +29,10 @@ AC_PROG_LIBTOOL
 #    introduced TagErrnoFileMayTooBig.
 #    introduced tagsFindPseudoTag.
 #
-AC_SUBST(LT_VERSION, [2:0:1])
+# 2:1:1
+#    no change in public interface.
+#
+AC_SUBST(LT_VERSION, [2:1:1])
 
 AC_ARG_ENABLE([gcov],
 	[AS_HELP_STRING([--enable-gcov],
