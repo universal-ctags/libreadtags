@@ -1,6 +1,10 @@
-# Version 0.?.?
+# Version 0.2.1
 
 - use "m" mode flag of fopen only when compiling with glibc 2.3 or higher.
+
+- LT_VERSION 2:1:1
+
+	- no change in public interface
 
 # Version 0.2.0
 
