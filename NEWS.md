@@ -20,6 +20,8 @@
 - add a new API function (tagsFindPseudoTag) for finding a pseudo tag for
   given name.
 
+- Use mmap(2) when opening a tags file if fopen() supports "m" mode flag.
+
 - LT_VERSION 2:0:1
 
 	- extend the API

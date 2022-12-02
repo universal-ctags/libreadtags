@@ -832,7 +832,14 @@ static tagFile *initialize (const char *const filePath, tagFileInfo *const info)
 		result->fields.max, sizeof (tagExtensionField));
 	if (result->fields.list == NULL)
 		goto mem_error;
-	result->fp = fopen (filePath, "rb");
+
+#define GLIBC_FOPEN_MODE_USE_MMAP "m"
+	result->fp = fopen (filePath, "rb" GLIBC_FOPEN_MODE_USE_MMAP);
+	if (result->fp == NULL)
+	{
+		errno = 0;
+		result->fp = fopen (filePath, "rb");
+	}
 	if (result->fp == NULL)
 	{
 		info->status.error_number = errno;
