@@ -1,4 +1,4 @@
-# Version ???
+# Version 0.2.0
 
 - delete debug output automatically printed when DEBUG is defiend in
   build-time.
@@ -21,6 +21,13 @@
   given name.
 
 - Use mmap(2) when opening a tags file if fopen() supports "m" mode flag.
+
+- LT_VERSION 2:0:1
+
+	- extend the API
+
+		- add a constant: TagErrnoFileMaybeTooBig
+		- add a function: tagsFindPseudoTag
 
 # Version 0.1.0
 
