@@ -1,3 +1,7 @@
+# Version 0.?.?
+
+- use "m" mode flag of fopen only when compiling with glibc 2.3 or higher.
+
 # Version 0.2.0
 
 - delete debug output automatically printed when DEBUG is defiend in
