@@ -519,6 +519,36 @@ static unsigned int countContinuousBackslashesBackward(const char *from,
 	return counter;
 }
 
+/* When unescaping, the input string becomes shorter.
+ * e.g. \t occupies two bytes on the tag file.
+ * It is converted to 0x9 and occupies one byte.
+ * memmove called here for shortening the line
+ * buffer. */
+static char *unescapeInPlace (char *q, char **tab, size_t *p_len)
+{
+	char *p = q;
+
+	while (*p != '\0')
+	{
+		const char *next = p;
+		int ch = readTagCharacter (&next);
+		size_t skip = next - p;
+
+		*p = (char) ch;
+		p++;
+		*p_len -= skip;
+		if (skip > 1)
+		{
+			/* + 1 is for moving the area including the last '\0'. */
+			memmove (p, next, *p_len + 1);
+			if (*tab)
+				*tab -= skip - 1;
+		}
+	}
+
+	return p;
+}
+
 static tagResult parseTagLine (tagFile *file, tagEntry *const entry, int *err)
 {
 	int i;
@@ -534,28 +564,7 @@ static tagResult parseTagLine (tagFile *file, tagEntry *const entry, int *err)
 		*tab = '\0';
 	}
 
-	/* When unescaping, the input string becomes shorter.
-	 * e.g. \t occupies two bytes on the tag file.
-	 * It is converted to 0x9 and occupies one byte.
-	 * memmove called here for shortening the line
-	 * buffer. */
-	while (*p != '\0')
-	{
-		const char *next = p;
-		int ch = readTagCharacter (&next);
-		size_t skip = next - p;
-
-		*p = (char) ch;
-		p++;
-		p_len -= skip;
-		if (skip > 1)
-		{
-			/* + 1 is for moving the area including the last '\0'. */
-			memmove (p, next, p_len + 1);
-			if (tab)
-				tab -= skip - 1;
-		}
-	}
+	p = unescapeInPlace (p, &tab, &p_len);
 
 	if (tab != NULL)
 	{
