@@ -52,4 +52,13 @@
 		}																\
 	}
 
+#define CHECK3(NAME,FILE,PAT)					\
+	CHECK ((NAME), name);						\
+	CHECK ((FILE), file);						\
+	CHECK ((PAT),  address.pattern)
+
+#define NEXT_CHECK3(NAME,FILE,PAT)				\
+	NEXT ();									\
+	CHECK3 (NAME,FILE,PAT)
+
 #endif	/* !TEST_FIELDS_H */

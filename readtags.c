@@ -45,6 +45,9 @@ struct sTagFile {
 	unsigned char initialized;
 		/* format of tag file */
 	unsigned char format;
+		/* 1 "u-ctags" is set to !_TAG_OUTPUT_MODE pseudo tag
+		 * in the tags file. */
+	unsigned char inputUCtagsMode;
 		/* how is the tag file sorted? */
 	tagSortType sortMethod;
 		/* pointer to file structure */
@@ -571,6 +574,15 @@ static tagResult parseTagLine (tagFile *file, tagEntry *const entry, int *err)
 		p = tab + 1;
 		entry->file = p;
 		tab = strchr (p, TAB);
+		if (file->inputUCtagsMode)
+		{
+			if (tab != NULL)
+			{
+				*tab = '\0';
+			}
+			p = unescapeInPlace (p, &tab, &p_len);
+		}
+
 		if (tab != NULL)
 		{
 			int fieldsPresent;
@@ -763,6 +775,11 @@ static tagResult readPseudoTags (tagFile *const file, tagFileInfo *const info)
 					err = ENOMEM;
 					break;
 				}
+			}
+			else if (strcmp (key, "TAG_OUTPUT_MODE") == 0)
+			{
+				if (strcmp (value, "u-ctags") == 0)
+					file->inputUCtagsMode = 1;
 			}
 
 			info->file.format     = file->format;
