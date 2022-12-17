@@ -30,7 +30,7 @@ check_PROGRAMS = \
 	\
 	$(NULL)
 
-EXTRA_DIST =
+EXTRA_DIST = test-fields.h
 
 AM_CPPFLAGS = -I $(top_srcdir) -DTAG_NO_COMPAT_SORT_TYPE
 AM_CFLAGS = $(GCOV_CFLAGS)
