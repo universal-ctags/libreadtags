@@ -1,7 +1,8 @@
 # Version ???
 
 - read input fields, values at the second column in a tag file, with
-  unescaping if !_TAG_OUTPUT_MODE in the tag file is "u-ctags".
+  unescaping if !_TAG_OUTPUT_MODE is "u-ctags" and
+  !_TAG_OUTPUT_FILESEP is "slash" in the tag file.
 
 - LT_VERSION ?:?:?
 
