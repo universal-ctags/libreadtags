@@ -44,3 +44,5 @@ tests/test-fix-unescaping
 tests/test-fix-unescaping-input-fields
 tests/test-fix-unescaping-input-fields-exuberant
 tests/test-fix-unescaping-input-fields-no-mode
+tests/test-fix-unescaping-input-fields-backslash
+tests/test-fix-unescaping-input-fields-no-filesep

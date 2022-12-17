@@ -14,6 +14,8 @@ TESTS = \
 	test-fix-unescaping-input-fields \
 	test-fix-unescaping-input-fields-exuberant \
 	test-fix-unescaping-input-fields-no-mode \
+	test-fix-unescaping-input-fields-backslash \
+	test-fix-unescaping-input-fields-no-filesep \
 	\
 	$(NULL)
 
@@ -33,6 +35,8 @@ check_PROGRAMS = \
 	test-fix-unescaping-input-fields \
 	test-fix-unescaping-input-fields-exuberant \
 	test-fix-unescaping-input-fields-no-mode \
+	test-fix-unescaping-input-fields-backslash \
+	test-fix-unescaping-input-fields-no-filesep \
 	\
 	$(NULL)
 
@@ -108,3 +112,11 @@ EXTRA_DIST += unescaping-input-fields-exuberant.tags
 test_fix_unescaping_input_fields_no_mode = test-fix-unescaping-input-fields-no-mode.c
 test_fix_unescaping_input_fields_no_mode_DEPENDENCIES = $(DEPS)
 EXTRA_DIST += unescaping-input-fields-no-mode.tags
+
+test_fix_unescaping_input_fields_backslash = test-fix-unescaping-input-fields-backslash.c
+test_fix_unescaping_input_fields_backslash_DEPENDENCIES = $(DEPS)
+EXTRA_DIST += unescaping-input-fields-backslash.tags
+
+test_fix_unescaping_input_fields_no_filesep = test-fix-unescaping-input-fields-no-filesep.c
+test_fix_unescaping_input_fields_no_filesep_DEPENDENCIES = $(DEPS)
+EXTRA_DIST += unescaping-input-fields-no-filesep.tags

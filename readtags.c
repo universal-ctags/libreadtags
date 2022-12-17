@@ -46,7 +46,8 @@ struct sTagFile {
 		/* format of tag file */
 	unsigned char format;
 		/* 1 "u-ctags" is set to !_TAG_OUTPUT_MODE pseudo tag
-		 * in the tags file. */
+		 * and "slash" is set to !_TAG_OUTPUT_FILESEP
+		 * pseudo tag in the tags file. */
 	unsigned char inputUCtagsMode;
 		/* how is the tag file sorted? */
 	tagSortType sortMethod;
@@ -691,6 +692,8 @@ static tagResult readPseudoTags (tagFile *const file, tagFileInfo *const info)
 	int err = 0;
 	tagResult result = TagSuccess;
 	const size_t prefixLength = strlen (PseudoTagPrefix);
+	int tag_output_mode_u_ctags = 0;
+	int tag_output_filesep_slash = 0;
 
 	info->file.format     = 1;
 	info->file.sort       = TAG_UNSORTED;
@@ -779,7 +782,12 @@ static tagResult readPseudoTags (tagFile *const file, tagFileInfo *const info)
 			else if (strcmp (key, "TAG_OUTPUT_MODE") == 0)
 			{
 				if (strcmp (value, "u-ctags") == 0)
-					file->inputUCtagsMode = 1;
+					tag_output_mode_u_ctags = 1;
+			}
+			else if (strcmp (key, "TAG_OUTPUT_FILESEP") == 0)
+			{
+				if (strcmp (value, "slash") == 0)
+					tag_output_filesep_slash = 1;
 			}
 
 			info->file.format     = file->format;
@@ -790,6 +798,10 @@ static tagResult readPseudoTags (tagFile *const file, tagFileInfo *const info)
 			info->program.version = file->program.version;
 		}
 	}
+
+	if (tag_output_mode_u_ctags && tag_output_filesep_slash)
+		file->inputUCtagsMode = 1;
+
 	if (fsetpos (file->fp, &startOfLine) < 0)
 		err = errno;
 
