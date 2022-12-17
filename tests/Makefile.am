@@ -11,6 +11,9 @@ TESTS = \
 	test-fix-unescaping \
 	test-fix-null-deref \
 	test-fix-large-tags \
+	test-fix-unescaping-input-fields \
+	test-fix-unescaping-input-fields-exuberant \
+	test-fix-unescaping-input-fields-no-mode \
 	\
 	$(NULL)
 
@@ -27,10 +30,13 @@ check_PROGRAMS = \
 	test-fix-unescaping \
 	test-fix-null-deref \
 	test-fix-large-tags \
+	test-fix-unescaping-input-fields \
+	test-fix-unescaping-input-fields-exuberant \
+	test-fix-unescaping-input-fields-no-mode \
 	\
 	$(NULL)
 
-EXTRA_DIST =
+EXTRA_DIST = test-fields.h
 
 AM_CPPFLAGS = -I $(top_srcdir) -DTAG_NO_COMPAT_SORT_TYPE
 AM_CFLAGS = $(GCOV_CFLAGS)
@@ -90,3 +96,15 @@ EXTRA_DIST += null-deref.tags
 
 test_fix_large_tags = test-fix-large-tags.c
 test_fix_large_tags_DEPENDENCIES = $(DEPS)
+
+test_fix_unescaping_input_fields = test-fix-unescaping-input-fields.c
+test_fix_unescaping_input_fields_DEPENDENCIES = $(DEPS)
+EXTRA_DIST += unescaping-input-fields.tags
+
+test_fix_unescaping_input_fields_exuberant = test-fix-unescaping-input-fields-exuberant.c
+test_fix_unescaping_input_fields_exuberant_DEPENDENCIES = $(DEPS)
+EXTRA_DIST += unescaping-input-fields-exuberant.tags
+
+test_fix_unescaping_input_fields_no_mode = test-fix-unescaping-input-fields-no-mode.c
+test_fix_unescaping_input_fields_no_mode_DEPENDENCIES = $(DEPS)
+EXTRA_DIST += unescaping-input-fields-no-mode.tags

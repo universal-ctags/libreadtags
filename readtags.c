@@ -42,9 +42,12 @@ typedef off_t rt_off_t;
 /* Information about current tag file */
 struct sTagFile {
 		/* has the file been opened and this structure initialized? */
-	short initialized;
+	unsigned char initialized;
 		/* format of tag file */
-	short format;
+	unsigned char format;
+		/* 1 "u-ctags" is set to !_TAG_OUTPUT_MODE pseudo tag
+		 * in the tags file. */
+	unsigned char inputUCtagsMode;
 		/* how is the tag file sorted? */
 	tagSortType sortMethod;
 		/* pointer to file structure */
@@ -519,6 +522,36 @@ static unsigned int countContinuousBackslashesBackward(const char *from,
 	return counter;
 }
 
+/* When unescaping, the input string becomes shorter.
+ * e.g. \t occupies two bytes on the tag file.
+ * It is converted to 0x9 and occupies one byte.
+ * memmove called here for shortening the line
+ * buffer. */
+static char *unescapeInPlace (char *q, char **tab, size_t *p_len)
+{
+	char *p = q;
+
+	while (*p != '\0')
+	{
+		const char *next = p;
+		int ch = readTagCharacter (&next);
+		size_t skip = next - p;
+
+		*p = (char) ch;
+		p++;
+		*p_len -= skip;
+		if (skip > 1)
+		{
+			/* + 1 is for moving the area including the last '\0'. */
+			memmove (p, next, *p_len + 1);
+			if (*tab)
+				*tab -= skip - 1;
+		}
+	}
+
+	return p;
+}
+
 static tagResult parseTagLine (tagFile *file, tagEntry *const entry, int *err)
 {
 	int i;
@@ -534,34 +567,22 @@ static tagResult parseTagLine (tagFile *file, tagEntry *const entry, int *err)
 		*tab = '\0';
 	}
 
-	/* When unescaping, the input string becomes shorter.
-	 * e.g. \t occupies two bytes on the tag file.
-	 * It is converted to 0x9 and occupies one byte.
-	 * memmove called here for shortening the line
-	 * buffer. */
-	while (*p != '\0')
-	{
-		const char *next = p;
-		int ch = readTagCharacter (&next);
-		size_t skip = next - p;
-
-		*p = (char) ch;
-		p++;
-		p_len -= skip;
-		if (skip > 1)
-		{
-			/* + 1 is for moving the area including the last '\0'. */
-			memmove (p, next, p_len + 1);
-			if (tab)
-				tab -= skip - 1;
-		}
-	}
+	p = unescapeInPlace (p, &tab, &p_len);
 
 	if (tab != NULL)
 	{
 		p = tab + 1;
 		entry->file = p;
 		tab = strchr (p, TAB);
+		if (file->inputUCtagsMode)
+		{
+			if (tab != NULL)
+			{
+				*tab = '\0';
+			}
+			p = unescapeInPlace (p, &tab, &p_len);
+		}
+
 		if (tab != NULL)
 		{
 			int fieldsPresent;
@@ -717,7 +738,7 @@ static tagResult readPseudoTags (tagFile *const file, tagFileInfo *const info)
 					err = TagErrnoUnexpectedFormat;
 					break;
 				}
-				file->format = (short) m;
+				file->format = (unsigned char) m;
 			}
 			else if (strcmp (key, "TAG_PROGRAM_AUTHOR") == 0)
 			{
@@ -754,6 +775,11 @@ static tagResult readPseudoTags (tagFile *const file, tagFileInfo *const info)
 					err = ENOMEM;
 					break;
 				}
+			}
+			else if (strcmp (key, "TAG_OUTPUT_MODE") == 0)
+			{
+				if (strcmp (value, "u-ctags") == 0)
+					file->inputUCtagsMode = 1;
 			}
 
 			info->file.format     = file->format;
