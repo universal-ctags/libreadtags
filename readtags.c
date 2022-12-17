@@ -42,9 +42,9 @@ typedef off_t rt_off_t;
 /* Information about current tag file */
 struct sTagFile {
 		/* has the file been opened and this structure initialized? */
-	short initialized;
+	unsigned char initialized;
 		/* format of tag file */
-	short format;
+	unsigned char format;
 		/* how is the tag file sorted? */
 	tagSortType sortMethod;
 		/* pointer to file structure */
@@ -726,7 +726,7 @@ static tagResult readPseudoTags (tagFile *const file, tagFileInfo *const info)
 					err = TagErrnoUnexpectedFormat;
 					break;
 				}
-				file->format = (short) m;
+				file->format = (unsigned char) m;
 			}
 			else if (strcmp (key, "TAG_PROGRAM_AUTHOR") == 0)
 			{
