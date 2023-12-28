@@ -1,4 +1,4 @@
-# Version ???
+# Version 0.3.0
 
 - fix calls to ctype functions (Colomban Wendling <ban@herbesfolles.org>)
 
@@ -6,7 +6,9 @@
   unescaping if !_TAG_OUTPUT_MODE is "u-ctags" and
   !_TAG_OUTPUT_FILESEP is "slash" in the tag file.
 
-- LT_VERSION ?:?:?
+- LT_VERSION 2:2:1
+
+	- no change in public interface
 
 # Version 0.2.1
 
