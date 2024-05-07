@@ -1,7 +1,7 @@
-cmake_minimum_required(VERSION 3.25)
+cmake_minimum_required(VERSION 3.22)
 project(libreadtags)
 
-set(CMAKE_C_STANDARD 11)
+set(CMAKE_C_STANDARD 99)
 
 add_library(${PROJECT_NAME} STATIC readtags.c)
 add_library(universal-ctags::${PROJECT_NAME} ALIAS ${PROJECT_NAME})
