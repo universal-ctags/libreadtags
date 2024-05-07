@@ -20,7 +20,7 @@ include(FetchContent)
 
 FetchContent_Declare(
         libreadtags
-        GIT_REPOSITORY https://github.com/ParticleG/libreadtags.git
+        GIT_REPOSITORY https://github.com/universal-ctags/libreadtags.git
         GIT_TAG master
 )
 
