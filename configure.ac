@@ -20,20 +20,25 @@ AC_PROG_LIBTOOL
 #
 # 0:0:0
 #    initial version; API is the same as readtags.h in Exuberant-ctags.
+#    (libreadtags.so.0.0.0)
 #
 # 1:0:0
 #    introduced tagsGetErrno() and tagErrno.
 #    rename sortType to tagSortType.
+#    (libreadtags.so.1.0.0)
 #
 # 2:0:1
 #    introduced TagErrnoFileMayTooBig.
 #    introduced tagsFindPseudoTag.
+#    (libreadtags.so.1.1.0)
 #
 # 2:1:1
 #    no change in public interface.
+#    (libreadtags.so.1.1.1)
 #
 # 2:2:1
 #    no change in public interface.
+#    (libreadtags.so.1.1.2)
 #
 AC_SUBST(LT_VERSION, [2:2:1])
 
