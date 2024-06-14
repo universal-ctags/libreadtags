@@ -45,3 +45,18 @@ endif ()
 add_library(universal-ctags::${PROJECT_NAME} ALIAS ${PROJECT_NAME})
 
 target_include_directories(${PROJECT_NAME} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
+#
+# TODO:
+#
+# * Support find_package
+#
+#   ParticleG's comments quoted from
+#   https://github.com/universal-ctags/libreadtags/pull/51#issuecomment-2148017962
+#
+#      Actually, if we prepare CMakeList.txt properly, other CMake projects
+#      just need to use find_package method to load this package, see
+#      Finding Packages. But if you use CMake method FetchContent to add
+#      libreadtags to your project, then current changes should be enough.
+#
+# * Running test cases
+#
