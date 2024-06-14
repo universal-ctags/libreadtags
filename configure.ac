@@ -1,4 +1,6 @@
 # -*- Autoconf -*-
+#
+# When updating the above version, you also update VERSION in CMakeList.txt.
 AC_INIT(libreadtags, 0.3.0)
 AC_CONFIG_MACRO_DIR([m4])
 AC_CONFIG_SRCDIR([readtags.c])
@@ -40,6 +42,8 @@ AC_PROG_LIBTOOL
 # 2:2:1
 #    no change in public interface.
 #    (libreadtags.so.1.1.2)
+#
+# When updating LT_VERSION, update BUILD_VERSION of CMakeLists.txt.
 #
 AC_SUBST(LT_VERSION, [2:2:1])
 
