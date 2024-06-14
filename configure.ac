@@ -8,7 +8,8 @@ AC_PROG_LIBTOOL
 
 # LT_VERSION => CURRENT[:REVISION[:AGE]]
 #
-# (the following instructions are taken from configure.ac in libskk)
+# (the following instructions are taken from configure.ac in libskk
+#  See also "7 Library interface versions" in the libtool info document.)
 #
 # If library source has changed since last release, increment revision
 # If public symbols have been added, removed or changed since last release,
