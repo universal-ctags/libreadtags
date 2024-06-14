@@ -13,6 +13,23 @@ If you are looking for command line interface for tags files,
 you will like [readtags command](https://docs.ctags.io/en/latest/man/readtags.1.html)
 shipped as part of Universal-ctags. It uses libreadtags extensively.
 
+You can build libreadtags with GNU Autotools and CMake.
+
+## Autotools Usage
+
+### Build
+```shell
+test -e autogen.sh && ./autogen.sh
+./configure
+make
+```
+
+### Test
+```shell
+make check
+```
+
+
 ## CMake Usage
 
 ### Build as a standalone project
