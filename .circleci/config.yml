@@ -1,9 +1,9 @@
 version: 2
 jobs:
-  fedora31:
+  fedora40:
     working_directory: ~/libreadtags
     docker:
-      - image: docker.io/fedora:31
+      - image: docker.io/fedora:40
     steps:
       - run:
           name: Install Git
@@ -24,10 +24,10 @@ jobs:
           name: Test
           command: |
             make check VERBOSE=1
-  fedora31_distcheck:
+  fedora40_distcheck:
     working_directory: ~/libreadtags
     docker:
-      - image: docker.io/fedora:31
+      - image: docker.io/fedora:40
     steps:
       - run:
           name: Install Git
@@ -51,5 +51,5 @@ workflows:
   version: 2
   build_and_test:
     jobs:
-      - fedora31
-      - fedora31_distcheck
+      - fedora40
+      - fedora40_distcheck
