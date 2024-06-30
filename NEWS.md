@@ -1,3 +1,7 @@
+# Version 0.4.0
+
+- support cmake as a build system (ParticleG <particle_g@outlook.com>)
+
 # Version 0.3.0
 
 - fix calls to ctype functions (Colomban Wendling <ban@herbesfolles.org>)
