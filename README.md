@@ -42,6 +42,14 @@ cmake -DCMAKE_BUILD_TYPE=Release -DLIBREADTAGS_BUILD_SHARED=ON -S . -B build
 cmake --build build --target readtags
 ```
 
+#### Configure, build, and test
+```shell
+mkdir build
+cmake -DCMAKE_BUILD_TYPE=Release -DLIBREADTAGS_BUILD_SHARED=ON -S . -B build
+cmake --build build
+ctest --test-dir build
+```
+
 #### Configure and install
 
 This will install the library and headers to `/usr/local`.
