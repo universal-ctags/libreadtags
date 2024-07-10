@@ -21,6 +21,14 @@ jobs:
             cmake -DCMAKE_BUILD_TYPE=Release -DLIBREADTAGS_BUILD_SHARED=ON -S . -B build
             cmake --build build --target readtags
       - run:
+          name: Build test cases
+          command: |
+            cmake --build build
+      - run:
+          name: Run the test cases
+          command: |
+            ctest --test-dir build || cat build/Testing/Temporary/LastTest.log
+      - run:
           name: Install
           command: |
             cmake --build build --target install
