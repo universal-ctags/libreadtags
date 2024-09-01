@@ -45,6 +45,35 @@ endif ()
 add_library(universal-ctags::${PROJECT_NAME} ALIAS ${PROJECT_NAME})
 
 target_include_directories(${PROJECT_NAME} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
+
+enable_testing()
+set(test_cases
+  test-api-tagsOpen
+  test-api-tagsFind
+  test-api-tagsFindPseudoTag
+  test-api-tagsFirstPseudoTag
+  test-api-tagsFirst
+  test-api-tagsClose
+  test-api-tagsSetSortType
+
+  test-fix-unescaping
+  test-fix-null-deref
+  test-fix-large-tags
+  test-fix-unescaping-input-fields
+  test-fix-unescaping-input-fields-exuberant
+  test-fix-unescaping-input-fields-no-mode
+  test-fix-unescaping-input-fields-backslash
+  test-fix-unescaping-input-fields-no-filesep
+)
+
+foreach(t IN LISTS test_cases)
+  add_executable(${t} tests/${t}.c)
+  target_link_libraries(${t} readtags)
+  add_test(NAME ${t}
+    COMMAND ${t}
+    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/tests)
+endforeach()
+
 #
 # TODO:
 #
@@ -57,6 +86,4 @@ target_include_directories(${PROJECT_NAME} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 #      just need to use find_package method to load this package, see
 #      Finding Packages. But if you use CMake method FetchContent to add
 #      libreadtags to your project, then current changes should be enough.
-#
-# * Running test cases
 #
