@@ -59,5 +59,6 @@ AC_PROG_CC_C99
 
 AC_CONFIG_FILES([Makefile
 		libreadtags.pc
+		libreadtags-uninstalled.pc
 		tests/Makefile])
 AC_OUTPUT

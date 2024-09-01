@@ -2,6 +2,8 @@
 
 - support cmake as a build system (ParticleG <particle_g@outlook.com>)
 
+- add libreadtags-uninstalled.pc.in.
+
 # Version 0.3.0
 
 - fix calls to ctype functions (Colomban Wendling <ban@herbesfolles.org>)
