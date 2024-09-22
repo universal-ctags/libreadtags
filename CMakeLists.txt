@@ -21,6 +21,23 @@ set(API_VERSION 1)
 # that is built with Autotools.
 set(BUILD_VERSION 1.1.2)
 
+# Taken from https://gitlab.kitware.com/cmake/community/-/wikis/contrib/macros/TestInline
+# Inspired from /usr/share/autoconf/autoconf/c.m4
+foreach(KEYWORD "inline" "__inline__" "__inline")
+  if(NOT DEFINED C_INLINE)
+    try_compile(C_HAS_${KEYWORD} "${CMAKE_CURRENT_BINARY_DIR}"
+      "${CMAKE_CURRENT_SOURCE_DIR}/test_inline.c"
+      COMPILE_DEFINITIONS "-Dinline=${KEYWORD}")
+    if(C_HAS_${KEYWORD})
+      SET(C_INLINE TRUE)
+      ADD_DEFINITIONS("-Dinline=${KEYWORD}")
+    endif(C_HAS_${KEYWORD})
+  endif(NOT DEFINED C_INLINE)
+endforeach(KEYWORD)
+if(NOT DEFINED C_INLINE)
+  ADD_DEFINITIONS("-Dinline=")
+endif(NOT DEFINED C_INLINE)
+
 if (LIBREADTAGS_BUILD_SHARED)
     message(STATUS "Building shared library")
     add_library(${PROJECT_NAME} SHARED readtags.c)
