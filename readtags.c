@@ -151,6 +151,7 @@ static int xdigitValue (unsigned char digit)
  * Reads the first character from the string, possibly un-escaping it, and
  * advances *s to the start of the next character.
  */
+inline
 static int readTagCharacter (const char **const s)
 {
 	const unsigned char *p = (const unsigned char *) *s;

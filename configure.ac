@@ -56,6 +56,7 @@ fi
 AC_SUBST([GCOV_CFLAGS])
 
 AC_PROG_CC_C99
+AC_C_INLINE
 
 AC_CONFIG_FILES([Makefile
 		libreadtags.pc
