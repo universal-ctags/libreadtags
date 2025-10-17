@@ -552,7 +552,8 @@ static unsigned int countContinuousBackslashesBackward(const char *from,
  * It is converted to 0x9 and occupies one byte.
  * memmove called here for shortening the line
  * buffer. */
-static char *unescapeInPlace (char *q, char **tab, size_t *p_len)
+READTAGS_INLINE
+char *unescapeInPlace (char *q, char **tab, size_t *p_len)
 {
 	char *p = q;
 
