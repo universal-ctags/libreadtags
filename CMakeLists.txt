@@ -81,6 +81,7 @@ set(test_cases
   test-fix-unescaping-input-fields-no-mode
   test-fix-unescaping-input-fields-backslash
   test-fix-unescaping-input-fields-no-filesep
+  test-fix-too-many-fields
 )
 
 foreach(t IN LISTS test_cases)
